@@ -1,0 +1,15 @@
+RPV Construcciones | SEO geográfico - cobertura comercial todo Chile
+
+INSTALACIÓN EN CPANEL
+1. Respaldar public_html/index.html y las páginas de producto existentes.
+2. Subir el contenido de este paquete a public_html, conservando los archivos existentes assets/ y conocimiento-rpv.md.
+3. Mantener las rutas /calderas/, /tinajas/ y /estufas-a-pellets/.
+4. Comprobar que el sitio y cada página se abran correctamente con HTTPS.
+5. Verificar Google Search Console y enviar https://www.rpvconstrucciones.com/sitemap.xml.
+
+COBERTURA Y PRECISIÓN
+Se declara recepción de consultas comerciales desde todo Chile. NO se anuncian oficinas, sucursales, direcciones, bodegas ni instalación/despacho garantizados para todas las regiones. Disponibilidad, entrega e instalación se confirman caso a caso.
+No se generaron páginas artificiales por ciudad/región.
+
+ANALYTICS
+GTM-KQR7BF6T y GA4 G-TGRT8J87TP siguen configurados en las páginas. GA4 está integrado directamente: no instalar segunda etiqueta GA4 en GTM con el mismo ID.

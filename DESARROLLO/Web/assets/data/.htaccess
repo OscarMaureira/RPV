@@ -1,0 +1,5 @@
+<IfModule mod_headers.c>
+  <FilesMatch "^(catalogo-rpv\.json|conocimiento-rpv\.md)$">
+    Header always set Cache-Control "no-store, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>

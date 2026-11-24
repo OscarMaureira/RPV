@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+
+// Copiar como conexion_rpv.local.php. No publicar ni versionar este archivo.
+$host = getenv('RPV_DB_HOST') ?: '127.0.0.1';
+$port = getenv('RPV_DB_PORT') ?: '4444';
+$dbname = getenv('RPV_DB_NAME') ?: 'rpvconst_DataMain_dev';
+$username = getenv('RPV_DB_USER') ?: 'rpv_local';
+$password = getenv('RPV_DB_PASSWORD') ?: '';
+
+$pdo = new PDO(
+    "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4",
+    $username,
+    $password,
+    [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_TIMEOUT => 5,
+    ]
+);

@@ -1,0 +1,11 @@
+---
+description: Protege la carpeta PRODUCCION frente a actualizaciones automáticas.
+alwaysApply: true
+---
+
+# Protección de PRODUCCION
+
+- Actualizar la carpeta `PRODUCCION` únicamente cuando el usuario invoque explícitamente la skill `/prod`.
+- Una solicitud de desarrollo, vista previa, prueba, QA o sincronización no autoriza por sí sola ejecutar `/prod` ni modificar `PRODUCCION`.
+- Para previsualizar Desarrollo en `http://localhost:8081`, usar un servidor dirigido a `DESARROLLO/Web` sin copiar archivos a `PRODUCCION`.
+- Si `8081` ya sirve `PRODUCCION`, informar cuál versión muestra y configurar la vista de Desarrollo sin modificar archivos de producción.

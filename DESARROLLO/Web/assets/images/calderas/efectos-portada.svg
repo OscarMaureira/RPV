@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1752 897">
+  <defs>
+    <radialGradient id="glow"><stop stop-color="#ffd66b" stop-opacity=".65"/><stop offset=".45" stop-color="#ff7115" stop-opacity=".25"/><stop offset="1" stop-color="#f93" stop-opacity="0"/></radialGradient>
+    <radialGradient id="vapor"><stop stop-color="#f3ffff" stop-opacity=".65"/><stop offset=".48" stop-color="#e2f9ff" stop-opacity=".31"/><stop offset="1" stop-color="#d8f4fa" stop-opacity="0"/></radialGradient>
+  </defs>
+  <ellipse cx="1394" cy="554" rx="47" ry="72" fill="url(#glow)">
+    <animate attributeName="opacity" values=".28;.75;.38;.68;.28" dur="2.1s" repeatCount="indefinite"/>
+  </ellipse>
+  <ellipse cx="1387" cy="577" rx="25" ry="40" fill="url(#glow)">
+    <animate attributeName="opacity" values=".65;.25;.8;.35;.65" dur="1.4s" repeatCount="indefinite"/>
+  </ellipse>
+  <g fill="url(#vapor)">
+    <ellipse cx="950" cy="466" rx="44" ry="27"><animate attributeName="opacity" values="0;.7;.6;0" dur="5.4s" begin="-1s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,4;12,-105" dur="5.4s" begin="-1s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="990" cy="463" rx="51" ry="32"><animate attributeName="opacity" values="0;.8;.65;0" dur="5.8s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,6;22,-128" dur="5.8s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="1030" cy="466" rx="54" ry="34"><animate attributeName="opacity" values="0;.72;.62;0" dur="6.5s" begin="-2s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,5;-20,-140" dur="6.5s" begin="-2s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="1070" cy="469" rx="47" ry="29"><animate attributeName="opacity" values="0;.8;.6;0" dur="5.7s" begin="-3s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,4;18,-110" dur="5.7s" begin="-3s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="1110" cy="466" rx="50" ry="33"><animate attributeName="opacity" values="0;.75;.65;0" dur="6.2s" begin="-4s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,5;-16,-130" dur="6.2s" begin="-4s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="1140" cy="470" rx="43" ry="27"><animate attributeName="opacity" values="0;.68;.55;0" dur="5.6s" begin="-2.5s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0,3;12,-95" dur="5.6s" begin="-2.5s" repeatCount="indefinite"/></ellipse>
+  </g>
+</svg>

@@ -1,0 +1,43 @@
+RPV Construcciones — Estructura de publicación organizada
+
+PUBLICACIÓN EN CPANEL
+1. Haz una copia de seguridad COMPLETA de public_html y, si corresponde, de la base de datos.
+2. En un entorno de pruebas (ideal), sube TODO el contenido de este ZIP a la raíz pública public_html; NO coloques la carpeta RPV_Web_Organizada como subcarpeta.
+3. Publica los archivos en sus nuevas rutas. No borres otros archivos del hosting que no formen parte de este paquete.
+4. Comprueba la portada, /calderas/, /tinajas/, /estufas-a-pellets/, el asistente, su base de conocimiento, el guardado de ubicación y los enlaces WhatsApp.
+5. Una vez verificado, elimina los recursos antiguos duplicados en raíz y en /assets/ solo si ya no los usa ninguna otra página. No es necesario borrarlos antes.
+6. Si existe caché en navegador, CDN o cPanel, purga la caché para que las páginas utilicen las nuevas rutas.
+
+ESTRUCTURA
+/index.html
+/calderas/index.html
+/tinajas/index.html
+/estufas-a-pellets/index.html
+/assets/images/backgrounds/fondo.webp
+/assets/images/calderas/calderas.webp
+/assets/images/tinajas/tinajas.webp
+/assets/images/estufas/estufas.webp
+/assets/js/asistente-rpv.js           (portada)
+/assets/js/asistente-rpv-calderas.js  (versión propia de /calderas/ conservada)
+/assets/data/conocimiento-rpv.md
+/api/guardar-ubicacion.php
+/robots.txt
+/sitemap.xml
+
+RUTAS ABSOLUTAS
+Las referencias internas a recursos empiezan con / para que funcionen tanto en / como en /calderas/.
+
+PERFORMANCE
+Se conservaron los mismos cuatro archivos WebP, sin recomprimirlos; se conserva el preload prioritario del fondo y los atributos de lazy-loading de las imágenes. No se agregaron librerías ni descargas externas.
+
+IMPORTANTE SOBRE EL PHP
+/api/guardar-ubicacion.php conserva su código original y necesita que exista el archivo de conexión externo /home/rpvconst/conexion_rpv.php; el paquete ZIP no lo incluye. El endpoint requiere un servidor con PHP y su conexión a base de datos configurada. Verifica el guardado real en el hosting.
+
+LOGO
+Este ZIP proporcionado no contenía ningún archivo de logo. Se mantiene el encabezado como estaba en el paquete original; no se sustituyó el diseño del header.
+
+CONSERVACIÓN
+No se alteró la lógica de JavaScript, el comportamiento de las páginas, el contenido del conocimiento ni la lógica de PHP. Solo se actualizaron las rutas de referencias y se reubicaron archivos. Los scripts de asistente de portada y calderas son diferentes y se mantuvieron diferenciados para evitar cambios de funcionalidad.
+
+DOCUMENTACIÓN ANTERIOR
+Los archivos en /docs/historico/ se conservan como referencia histórica. Sus instrucciones de rutas antiguas no deben usarse para este paquete.

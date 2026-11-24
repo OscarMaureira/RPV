@@ -1,0 +1,9 @@
+# Las copias de respaldo nunca deben quedar accesibles desde el webroot.
+<IfModule mod_alias.c>
+  RedirectMatch 404 "(?i)^/BKP(?:/|$)"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^BKP(?:/|$) - [R=404,L,NC]
+</IfModule>

@@ -1,0 +1,12 @@
+---
+description: Mantiene todos los cambios del proyecto compatibles con cPanel y el flujo DESARROLLO a PRODUCCION
+alwaysApply: true
+---
+
+# Compatibilidad con producción
+
+- Diseña cada cambio para que pueda trasladarse a producción por el flujo descrito en `.cursor/skills/prod/SKILL.md`.
+- Conserva las rutas y condiciones de ambiente que usa cPanel. Si agregas código privado requerido por el sitio, inclúyelo en la preparación de producción y documenta dónde se instala fuera de `public_html`.
+- Mantén contraseñas y configuraciones reales fuera del repositorio, de `PRODUCCION` y de `public_html`. Versiona solo plantillas sin secretos.
+- Actualiza el script `prod` y esta documentación cuando un cambio altere los artefactos, validaciones, rutas o requisitos de instalación.
+- No ejecutes el proceso `/prod` ni publiques en cPanel salvo instrucción explícita del usuario.

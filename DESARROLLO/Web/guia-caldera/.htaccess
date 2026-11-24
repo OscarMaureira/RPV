@@ -1,0 +1,6 @@
+AddType text/html .html
+AddType application/manifest+json .webmanifest
+AddType application/javascript .js
+AddType image/webp .webp
+AddType image/png .png
+AddType image/svg+xml .svg

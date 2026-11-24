@@ -1,0 +1,13 @@
+﻿PASO DE PRODUCCION - RPV Construcciones
+Fecha de generación: 2026-11-11 17:27:30 -03:00
+Dominio: https://www.rpvconstrucciones.com/
+Estado: LISTO PARA CPANEL
+Rutas públicas: verificadas
+Credenciales en public_html: no detectadas
+Resumen: 1 archivo(s), 1 carpeta(s) afectadas.
+
+Carpetas afectadas:
+- (raÃ­z de Web)
+
+Archivos:
+~ modificado: index.html

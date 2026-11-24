@@ -1,0 +1,3 @@
+# Migraciones ejecutadas correctamente en cPanel.
+# Formato: ruta relativa bajo migrations|SHA256
+# Añade una línea solo después de ejecutar y verificar el SQL generado.

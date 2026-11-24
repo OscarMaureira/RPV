@@ -1,0 +1,42 @@
+Rodrigo Pinochet Velozo
+pasaje el olmo sur 4622 pasaje el olmo sur 4622
+San Bernardo, Región Metropolitana, 8050000
+rpinochet14@gmail.com
+
+Rpinochet69!
+
+rpvconstrucciones.com
+
+
+correo: rpinochetv@rpvconstrucciones.com
+contraseña: RPVspa2026
+
+correo: contacto@rpvconstrucciones.com
+contraseña: RPVspa2026
+
++56964170206
+-----------------------------------------------------------------
+
+Cpanel:138.0.21
+credenciales:
+	rpvconst
+	en1@rd4to3e
+
+-----------------------------------------------------------------
+
+Google Analytics:
+
+<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KQR7BF6T"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+</script>
+
+---------------------------
+
+Base de dtos: rpvconst_DataMain
+user bd: 
+	rpvconst_conectBD
+	O752010mg
+
