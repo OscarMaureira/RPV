@@ -4,6 +4,9 @@ if(window.__RPV_CHAT_INITIALIZED__)return;
 window.__RPV_CHAT_INITIALIZED__=true;
 const $=id=>document.getElementById(id), L=$('launcher'),C=$('chat'),B=$('backdrop'),M=$('messages'),Q=$('question'),WA=$('chatWa'),S=$('status'),H=$('hint'),anchor=$('anchor'),mobile=matchMedia('(max-width:767px)');
 let sections=[],loaded=false,loadAttempted=false,last='',savedScroll=0,preventLaunchClick=false;
+if(!window.RPVContexto){console.error('RPV: contexto-rpv.js no está disponible');return;}
+let knowledgeBase=null;
+const conversationContext=window.RPVContexto.create({storageKey:'rpv-contexto-v1:general'});
 const stop=new Set('el la los las un una unos unas de del y o a al por para con en es son se que como cuál cuales qué cual quiero saber me mi sus sobre ustedes tienen hay está estan más puedo podrian favor información informacion necesito hola gracias buen buenas producto productos'.split(' '));
 const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const tok=t=>[...new Set((norm(t).match(/[a-z0-9]+/g)||[]).map(w=>({tinajas:'tinaja',calderas:'caldera',estufas:'estufa',pellets:'pellet',precios:'precio',modelos:'modelo',envios:'envio',despachos:'despacho',garantias:'garantia',instalaciones:'instalacion',cotizaciones:'cotizacion'}[w]||w)))].filter(w=>w.length>2&&!stop.has(w));
@@ -370,7 +373,7 @@ function offerLocation(question){
   const actions=document.createElement('div');actions.className='location-actions';
   const locate=document.createElement('button');locate.type='button';locate.textContent='📍 Compartir mi ubicación';
   const manual=document.createElement('div');manual.className='location-manual';
-  const input=document.createElement('input');input.type='text';input.placeholder='Comuna y región';input.setAttribute('aria-label','Ingresar comuna y región');input.maxLength=120;
+  const input=document.createElement('input');input.type='text';input.placeholder='Ej: San Miguel, Región Metropolitana';input.setAttribute('aria-label','Ingresar comuna y región, separadas por una coma');input.maxLength=120;
   const save=document.createElement('button');save.type='button';save.textContent='Usar esta ubicación';
   manual.append(input,save);actions.append(locate);panel.append(prompt,actions,manual,note);M.append(panel);
   function confirmLocation(description,data=null){
@@ -398,19 +401,30 @@ function offerLocation(question){
     })();
   }
   let pendingCoordinates=null;
+  function showManualLocationError(message){
+    note.textContent=message;
+    note.classList.add('is-error');
+    note.setAttribute('role','alert');
+    input.setAttribute('aria-invalid','true');
+    anchorResponse(note);
+    input.focus({preventScroll:true});
+  }
   save.addEventListener('click',()=>{
-    const value=input.value.trim();if(!value){input.focus();return;}
+    const value=input.value.trim();
+    if(!value){showManualLocationError('Falta la ubicación. Escribe tu comuna y región; por ejemplo: San Miguel, Región Metropolitana.');return;}
     const raw=value.split(',').map(x=>x.trim());
     if(raw.length!==2||!raw[0]||!raw[1]){
-      note.textContent='Escribe comuna y región separadas por una coma. Ejemplo: Santiago, Región Metropolitana.';
-      input.focus();return;
+      showManualLocationError('Falta la región. Escribe la comuna y luego la región separadas por una coma; por ejemplo: San Miguel, Región Metropolitana.');
+      return;
     }
+    note.classList.remove('is-error');note.removeAttribute('role');input.removeAttribute('aria-invalid');
     const prior=customerLocation?.data||pendingCoordinates;
     const gps=prior&&Number.isFinite(prior.latitud)&&Number.isFinite(prior.longitud);
     const data=gps?{...prior,comuna:raw[0],region:raw[1]}:{comuna:raw[0],region:raw[1],provincia:null,pais:'Chile',latitud:null,longitud:null,precision_metros:null,url_google_maps:null,fuente_ubicacion:'manual'};
     const coords=gps?' Coordenadas: '+prior.latitud.toFixed(5)+', '+prior.longitud.toFixed(5)+'. Mapa: '+prior.url_google_maps+'.':'';
     confirmLocation('Comuna y región indicadas por el cliente: '+value+'.'+coords,data);
   });
+  input.addEventListener('input',()=>{if(input.getAttribute('aria-invalid')==='true'){input.removeAttribute('aria-invalid');note.classList.remove('is-error');note.removeAttribute('role');note.textContent='Formato: comuna, región. Ejemplo: San Miguel, Región Metropolitana.';}});
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save.click();}});
   // Geocodificación inversa con respaldo. Los límites administrativos no siempre
   // están presentes en los proveedores: nunca completar con datos inventados.
@@ -591,6 +605,7 @@ function typeAssistant(text,after=null){
   return node;
 }
 function clearConversation(){
+  conversationContext.reset();
   stopTyping(false);
   M.replaceChildren();
   TEAM_ACTION.replaceChildren();TEAM_ACTION.classList.remove('has-action');
@@ -616,6 +631,20 @@ async function send(t){
   currentQuestion.classList.add('current-question');
   showPinnedQuestion(t);
   M.scrollTop=M.scrollHeight;
+  {
+    await loadKnowledge();
+    knowledgeBase=knowledgeBase||window.RPVContexto.createKnowledgeBase(sections);
+    const contextResult=conversationContext.process(t,{knowledge:knowledgeBase});
+    if(contextResult.ignorado)return;
+    const contextReply=contextResult.respuesta;
+    updateWhatsappQuestion(t);
+    Q.value='';
+    const askLocation=needsLocation(t,contextReply)&&!customerLocation;
+    const askTeam=needsTeamConfirmation(contextReply);
+    if(askTeam)offerTeamConfirmation(t,contextReply);
+    typeAssistant(contextReply,()=>{if(askLocation)offerLocation(t);});
+    return;
+  }
   const isCatalog=catalogIntent(t);
   const selectedCatalog=awaitingCatalogChoice?catalogChoice(t):null;
   const conversational=isCatalog?CATALOG_REPLY:selectedCatalog?catalogChoiceReply(selectedCatalog):conversationalResponse(t);
@@ -696,7 +725,9 @@ async function send(t){
      if(askLocation)offerLocation(t);
    });
 }
-$('form').addEventListener('submit',e=>{e.preventDefault();send(Q.value)});document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>send(b.dataset.q)));
+let sendQueue=Promise.resolve();
+function enqueueSend(text){sendQueue=sendQueue.then(()=>send(text)).catch(error=>console.error('RPV chat send error',error));}
+$('form').addEventListener('submit',e=>{e.preventDefault();enqueueSend(Q.value)});document.querySelectorAll('[data-q]').forEach(b=>b.addEventListener('click',()=>enqueueSend(b.dataset.q)));
 function updateSticky(){if(!mobile.matches||C.classList.contains('open')||L.classList.contains('dragged')){if(!mobile.matches)L.classList.remove('sticky');return;}L.classList.toggle('sticky',anchor.getBoundingClientRect().top<9);}
 window.addEventListener('scroll',updateSticky,{passive:true});window.addEventListener('resize',updateSticky);window.addEventListener('pageshow',updateSticky);
 function openChat(){if(preventLaunchClick)return;L.style.display='none';H.style.display='none';C.classList.add('open');if(mobile.matches){savedScroll=scrollY;document.documentElement.classList.add('locked');document.body.classList.add('locked');document.body.style.top='-'+savedScroll+'px';B.classList.add('show');C.setAttribute('aria-modal','true');}loadKnowledge();requestAnimationFrame(()=>{if(C.classList.contains('open'))Q.focus({preventScroll:true});});}
