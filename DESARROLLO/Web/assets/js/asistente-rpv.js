@@ -1,5 +1,7 @@
 // Asistente RPV | Version 2026-11-10-11 | ubicacion discreta y guardado automatico
 (()=>{'use strict';
+if(window.__RPV_CHAT_INITIALIZED__)return;
+window.__RPV_CHAT_INITIALIZED__=true;
 const $=id=>document.getElementById(id), L=$('launcher'),C=$('chat'),B=$('backdrop'),M=$('messages'),Q=$('question'),WA=$('chatWa'),S=$('status'),H=$('hint'),anchor=$('anchor'),mobile=matchMedia('(max-width:767px)');
 let sections=[],loaded=false,loadAttempted=false,last='',savedScroll=0,preventLaunchClick=false;
 const stop=new Set('el la los las un una unos unas de del y o a al por para con en es son se que como cuál cuales qué cual quiero saber me mi sus sobre ustedes tienen hay está estan más puedo podrian favor información informacion necesito hola gracias buen buenas producto productos'.split(' '));
@@ -10,17 +12,23 @@ function expand(words){let out=new Set(words);for(const [key,syn] of Object.entr
 function parseMarkdown(md){const parts=[];let current=null;for(const line of md.split(/\r?\n/)){let match=line.match(/^#{2,3}\s+(.+)$/);if(match){if(current&&current.text.trim())parts.push(current);current={title:match[1].trim(),text:''};continue;}if(/^#\s+/.test(line)||/^>/.test(line))continue;if(!current)current={title:'Información general',text:''};if(line.trim())current.text+=line.replace(/^[-*]\s*/, '').trim()+'\n';}if(current&&current.text.trim())parts.push(current);return parts;}
 let knowledgePromise=null;
 async function loadKnowledge(){
+ if(loaded)return true;
  if(knowledgePromise)return knowledgePromise;
- S.textContent='Consultando catálogo…';
+ S.textContent='Cargando conocimiento…';
  knowledgePromise=(async()=>{
   try{
-   const catalog=await window.RPVCatalogo.load();
-   if(!catalog)throw Error('Catálogo no disponible');
-   sections=parseMarkdown(catalog.conocimiento);
-   if(sections.length<2)throw Error('Conocimiento incompleto');
-   loaded=true;loadAttempted=true;S.classList.remove('is-error');S.textContent='';return true;
-  }catch(e){loaded=false;loadAttempted=false;S.classList.add('is-error');S.textContent='No se pudo consultar el catálogo. Puedes confirmar precios por WhatsApp.';return false;}
-  finally{knowledgePromise=null;}
+   const r=await fetch('/assets/data/conocimiento-rpv.md?v=20261110-11',{cache:'no-store'});
+   if(!r.ok)throw Error('HTTP '+r.status);
+   const md=await r.text();
+   const parsed=parseMarkdown(md);
+   if(parsed.length<2)throw Error('Archivo Markdown sin secciones');
+   sections=parsed;loaded=true;loadAttempted=true;
+   S.classList.remove('is-error');S.textContent='';return true;
+  }catch(e){
+   loaded=false;loadAttempted=false;S.classList.add('is-error');
+   S.textContent='⚠ No se pudo cargar conocimiento-rpv.md. Revisa su publicación en el servidor.';
+   console.warn('RPV knowledge load error',e);return false;
+  }finally{knowledgePromise=null;}
  })();
  return knowledgePromise;
 }
@@ -35,9 +43,22 @@ function productFrom(text){
 function priceIntent(text){return /\b(precio|precios|valor|valores|cuanto\s+(?:cuesta|cuestan|sale|salen|vale|valen)|costo|costos|tarifa|tarifas|lista\s+de\s+precios)\b/.test(norm(text));}
 function headingSection(title){return sections.find(s=>norm(s.title)===norm(title));}
 function respond(question){
- const commercial=window.RPVCatalogo.answer(question);if(commercial!==null)return commercial;
  if(!loaded)return 'No pude cargar la base de conocimiento. Puedes volver a intentarlo o continuar por WhatsApp.';
  const q=norm(question),product=productFrom(question),isPrice=priceIntent(question);
+ // Prioridad explícita: intención de precio + categoría + modelo, sin mezclar productos.
+ if(isPrice&&product){
+  let specific=null;
+  if(product==='caldera'){
+   const model=q.match(/\b(?:equipo|modelo|caldera)\s*(?:n(?:umero|ro)?\s*)?([123])\b/);
+   if(model)specific=headingSection('¿Cuánto cuesta la caldera Equipo '+model[1]+'?');
+  }else if(product==='tinaja'){
+   const capacity=q.match(/\b([47])\s*personas?\b/);
+   if(capacity)specific=headingSection('¿Cuánto cuesta una tinaja para '+capacity[1]+' personas?');
+  }
+  const preferred={caldera:'¿Cuáles son los precios de las calderas?',tinaja:'¿Cuáles son los precios de las tinajas?',estufa:'¿Cuáles son los precios de las estufas a pellets?'};
+  const matched=specific||headingSection(preferred[product]);
+  if(matched)return matched.text.trim();
+ }
  // La coincidencia literal completa debe ganar a las coincidencias por vocabulario.
  const exact=sections.find(sec=>norm(sec.title).replace(/[^a-z0-9 ]/g,'').trim()===q.replace(/[^a-z0-9 ]/g,'').trim());
  if(exact)return exact.text.trim();
@@ -120,8 +141,11 @@ function calderaFrequency(text){
  return null;
 }
 function calderaAdvice(volume,frequency){
- const amount=volume?`Para ${fmtNum(volume)} litros, `:'';
- return amount+'conviene comparar las calderas tipo A, B y C con el equipo según la frecuencia de uso y las conexiones. No tenemos una equivalencia aprobada con los antiguos modelos numerados ni podemos asegurar compatibilidad por el volumen solamente. ¿Quieres revisar precios y condiciones de los tipos A, B y C?';
+ const recommendation=frequency==='multiple'?'Equipo 3':frequency==='arriendo'||frequency==='frecuente'?'Equipo 2':'Equipo 1';
+ const usage=frequency==='multiple'?'un proyecto con varias tinajas':frequency==='arriendo'?'una tinaja de arriendo':frequency==='frecuente'?'uso frecuente':'uso personal u ocasional';
+ const amount=volume?`Para ${fmtNum(volume)} litros (${fmtNum(volume/1000)} veces el volumen de referencia de 1.000 litros), `:'Según el uso que describes, ';
+ const caution='Esta es una orientación inicial, no una confirmación de capacidad o compatibilidad. Los tiempos y consumos publicados para 1.000 litros no pueden multiplicarse directamente para calcular otros volúmenes; dependen de las temperaturas inicial y final, la instalación y las condiciones de funcionamiento.';
+ return `${amount}y considerando ${usage}, nuestra recomendación comercial inicial es el ${recommendation}. ${caution} ¿Quieres conocer su precio de referencia o revisar las condiciones de instalación?`;
 }
 
 // Flujo de selección de producto tras una respuesta de catálogo.
@@ -147,14 +171,13 @@ function tinajaCapacity(text){
  return m[1]==='4'||m[1]==='cuatro'?4:7;
 }
 function tinajaAnswer(capacity){
- const p=window.RPVCatalogo.get('tinaja-'+capacity+'-personas');
- return p?p.respuesta+' ¿La necesitas para uso familiar o arriendo?':'Confirma el precio y las condiciones de esa tinaja con el equipo por WhatsApp.';
+ if(capacity===4)return 'Para 4 personas, RPV informa una tinaja con medidas referenciales de 1,75 m de diámetro y 0,60 m de altura. Su precio de referencia es $1.450.000 CLP. Es una alternativa presentada para cabañas de arriendo. La capacidad en litros y los accesorios incluidos deben confirmarse. ¿La necesitas para uso familiar o arriendo?';
+ return 'Para 7 personas, RPV ofrece una tinaja tipo jacuzzi de aproximadamente 2,00 m de diámetro y 1,10 m de altura, con una capacidad referencial de 2.500 litros. Su precio de referencia es $2.850.000 CLP. Confirma el equipamiento incluido y el valor vigente. ¿La utilizarás en casa o en un proyecto turístico?';
 }
 function productStart(product){
- if(product==='tinaja')return window.RPVCatalogo.list('tinajas').map(p=>p.nombre+': '+p.precio_texto+'.').join(' ')+' ¿Para cuántas personas la necesitas: 4 o 7?';
- if(product==='caldera')return 'Disponemos de calderas tipo A, B y C. Para orientarte en la elección, ¿cuántos litros de agua tiene tu tinaja o piscina pequeña?';
- const p=window.RPVCatalogo.get('estufa-pellet');
- return (p?p.rendimiento:'Confirma las características del equipo con RPV.')+' ¿Cuántos metros cuadrados necesitas calefaccionar?';
+ if(product==='tinaja')return 'Tenemos tinajas para 4 y 7 personas. La de 4 personas tiene un precio referencial de $1.450.000 CLP y la de 7 personas, $2.850.000 CLP. ¿Para cuántas personas la necesitas: 4 o 7?';
+ if(product==='caldera')return 'Disponemos de tres equipos de calderas a pellets o alternativas mixtas, según modelo. Para orientarte en la elección, ¿cuántos litros de agua tiene tu tinaja o piscina pequeña?';
+ return 'Contamos con una estufa a pellets para aproximadamente 70 m², con consumo de referencia de 1,3 kg de pellets por hora. La cobertura depende de la aislación y del lugar. ¿Cuántos metros cuadrados necesitas calefaccionar?';
 }
 function productContext(question,previousContext,entered){
  const t=norm(question).trim();
@@ -167,6 +190,8 @@ function productContext(question,previousContext,entered){
    return null;
  }
  if(previousContext==='tinaja_personas'){
+   const people=tinajaPeopleReply(question);
+   if(people)return {reply:people,next:null};
    const cap=tinajaCapacity(t);
    if(cap)return {reply:tinajaAnswer(cap),next:null};
    const selected=productSelection(t);
@@ -186,20 +211,88 @@ function measureAnswer(input,kind){
  const n=input.value;
  if(kind==='m2'){
   if(n>10000)return 'La superficie indicada parece demasiado grande. ¿Puedes confirmar cuántos m² necesitas calefaccionar?';
-  const p=window.RPVCatalogo.get('estufa-pellet');
-  return `Para ${fmtNum(n)} m² debemos revisar aislación, altura del recinto y evacuación de gases. ${p?p.rendimiento:'Confirma la cobertura del equipo con RPV.'} No podemos asegurar cobertura sin evaluar el espacio. ¿Tu vivienda tiene buena aislación?`;
+  const difference=Math.abs(n-70),pct=difference/70*100;
+  const baseline='La estufa informada por RPV tiene una cobertura referencial de aproximadamente 70 m², que puede variar según la aislación, altura del recinto y condiciones climáticas.';
+  if(n<70)return `Para ${fmtNum(n)} m², la superficie está ${fmtNum(difference)} m² (${fmtNum(pct)} %) por debajo de la cobertura de referencia. ${baseline} Podría ser una alternativa, pero no podemos garantizar su rendimiento sin evaluar el espacio. ¿Tu vivienda tiene buena aislación?`;
+  if(n===70)return `Para ${fmtNum(n)} m², la superficie coincide con la cobertura referencial del equipo. ${baseline} ¿Tu vivienda tiene buena aislación?`;
+  return `Para ${fmtNum(n)} m², necesitas cubrir ${fmtNum(difference)} m² (${fmtNum(pct)} %) más que la referencia de 70 m². ${baseline} No sería responsable asegurar que un solo equipo cubra toda esa superficie. Tampoco podemos asumir que dos estufas sean suficientes sin un cálculo térmico. ¿Cómo es la aislación de tu vivienda?`;
  }
  const confirmation=volumeConfirmation(input);
  if(confirmation)return confirmation;
- return `Para ${fmtNum(n)} litros, las referencias publicadas no permiten extrapolar directamente tiempos ni consumo a tu instalación. `+window.RPVCatalogo.list('calderas').map(p=>p.nombre+': '+p.rendimiento).join(' ')+' ¿La usarás ocasionalmente, con frecuencia o para arriendo?';
+ const baseline='Los tres equipos RPV tienen rendimientos de referencia publicados para 1.000 litros, pero no se pueden extrapolar sus tiempos ni consumo de pellets proporcionalmente sin conocer la temperatura inicial, la temperatura objetivo y las condiciones de instalación.';
+ if(n===1000)return `Para una tinaja de ${fmtNum(n)} litros, ${baseline} Equipo 1: unas 2,5 horas; Equipo 2: unas 2 horas; Equipo 3: unas 1,3 horas, según las referencias informadas y sujetas a validación. ¿La usarás ocasionalmente, con frecuencia o para arriendo?`;
+ return `Para ${fmtNum(n)} litros, el volumen equivale a ${fmtNum(n/1000)} veces la referencia de 1.000 litros. ${baseline} ¿La usarás ocasionalmente, con frecuencia o para arriendo? Así podremos orientarte sobre el modelo sin inventar tiempos de calentamiento.`;
 }
 function insulationAnswer(text){
  const t=norm(text);
  if(t.length>110)return null;
- if(/\b(no|mala|poca|deficiente|sin aislacion|mal aislada|mal aislado)\b/.test(t))return 'Gracias. Si la aislación es deficiente, la estufa puede cubrir menos que la cobertura publicada, porque aumentan las pérdidas de calor. Para recomendar un equipo con seguridad se necesita revisar la altura del recinto, las ventanas, la ventilación y la evacuación de gases. ¿Se trata de una casa, cabaña o departamento?';
- if(/\b(si|buena|bien aislada|bien aislado|aislada|aislado)\b/.test(t))return 'Gracias. Una buena aislación favorece el rendimiento, pero la cobertura continúa siendo referencial. También importa la altura del recinto, la zona climática y la salida segura de gases. ¿Se trata de una casa, cabaña o departamento?';
+ if(/\b(no|mala|poca|deficiente|sin aislacion|mal aislada|mal aislado)\b/.test(t))return 'Gracias. Si la aislación es deficiente, la estufa puede cubrir menos que los 70 m² indicados como referencia, porque aumentan las pérdidas de calor. Para recomendar un equipo con seguridad se necesita revisar la altura del recinto, las ventanas, la ventilación y la evacuación de gases. ¿Se trata de una casa, cabaña o departamento?';
+ if(/\b(si|buena|bien aislada|bien aislado|aislada|aislado)\b/.test(t))return 'Gracias. Una buena aislación favorece el rendimiento, pero los 70 m² continúan siendo referenciales. También importa la altura del recinto, la zona climática y la salida segura de gases. ¿Se trata de una casa, cabaña o departamento?';
  return null;
 }
+
+// Respuestas conversacionales: se resuelven antes de consultar el catálogo.
+let previousIntent='', previousReply='', repeatCount=0;
+const CATALOG_REPLY='¡Claro! En RPV Construcciones ofrecemos tres líneas de productos:\n\n🔥 Calderas: equipos para temperar agua de tinajas y piscinas pequeñas, según compatibilidad.\n\n🛁 Tinajas: modelos para 4 y 7 personas, para uso familiar o proyectos turísticos.\n\n🏠 Estufas a pellets: calefacción para espacios de aproximadamente 70 m², según las condiciones del recinto.\n\n¿Qué producto te interesa conocer: calderas, tinajas o estufas a pellets?';
+let awaitingCatalogChoice=false;
+
+function tinajaPeopleReply(message){
+ const t=norm(message).trim();
+ const m=t.match(/^(?:(?:para|somos|seremos|necesito|quiero|de|unas?|aprox(?:imadamente)?)\s+)?(\d{1,2}|cuatro|seis|siete|cinco|tres|ocho)\s*(?:personas?|puestos?)?[.!]?$/);
+ if(!m)return null;
+ const names={tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8};
+ const n=names[m[1]]||Number(m[1]);
+ if(n===4)return 'Para 4 personas tenemos una tinaja de referencia a $1.450.000 CLP. ¿Quieres conocer sus medidas y equipamiento?';
+ if(n===7)return 'Para 7 personas tenemos una tinaja tipo jacuzzi de referencia a $2.850.000 CLP. ¿Quieres conocer sus características?';
+ if(n===5||n===6)return `Entiendo que buscas una tinaja para ${n} personas. Tenemos modelos para 4 y 7 personas; la de 7 podría ajustarse a tu necesidad. ¿Quieres conocer sus características y precio?`;
+ if(n>=1&&n<=3)return `Para ${n} personas, nuestro modelo más pequeño informado es el de 4 personas. ¿Te gustaría conocer sus características?`;
+ if(n>=8)return `Para ${n} personas, nuestros modelos informados son de hasta 7 personas. Podemos consultar alternativas para tu proyecto. ¿Quieres contactar al equipo?`;
+ return null;
+}
+
+function catalogIntent(message){
+ const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+ if(/\b(precio|precios|cuanto|valor|costo|despacho|garantia|instalacion|medidas|litros|potencia)\b/.test(t))return false;
+ return /^(?:(?:hola|buenas|buenos dias|buenas tardes)\s+)?(?:quiero|quisiera|necesito|me gustaria|podrian|pueden|deseo|busco|me interesa)\s+(?:saber|conocer|informacion|informarme|ver|mirar|que me cuenten|que me muestren)(?:\s+(?:mas|algo|un poco|todo))?\s+(?:de|sobre|acerca de|los|sus|el|la|del|de los|de sus)?\s*(?:productos|catalogo|lo que venden|lo que ofrecen|sus productos|la tienda|rpv)(?:\s+(?:que tienen|disponibles))?$/.test(t)
+ || /^(?:que|cuales)\s+(?:productos|cosas|articulos)\s+(?:tienen|venden|ofrecen|hay|manejan)$/.test(t)
+ || /^(?:productos|catalogo|ver productos|mostrar productos|muestrame los productos|informacion de productos|informacion sobre productos|que venden|que ofrecen|que tienen|cuentame de los productos)$/.test(t);
+}
+function catalogChoice(message){
+ const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:calderas?|calentadores?)(?: a pellets?)?$/.test(t))return 'caldera';
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:tinajas?|tinas?|jacuzzi)(?:s)?$/.test(t))return 'tinaja';
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:estufas?)(?: a pellets?)?$/.test(t))return 'estufa';
+ return null;
+}
+function catalogChoiceReply(choice){
+ if(choice==='caldera')return 'Contamos con tres equipos de calderas para temperar agua. Para recomendarte uno, ¿cuántos litros tiene tu tinaja o piscina pequeña?';
+ if(choice==='tinaja')return 'Tenemos tinajas para 4 personas ($1.450.000 CLP de referencia) y 7 personas ($2.850.000 CLP de referencia). Los valores y equipamientos deben confirmarse. ¿Cuál te interesa?';
+ return 'Ofrecemos una estufa a pellets con cobertura referencial de aproximadamente 70 m². ¿Cuántos metros cuadrados necesitas calefaccionar?';
+}
+function conversationalResponse(message){
+  const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+  const simple=t.replace(/^(?:oye|estimados|estimado|equipo rpv)\s+/,'');
+  if(/^(?:hola+|holi+|holaa+|buenas+|buenos dias|buen dia|buenas tardes|buenas noches|que tal|saludos|hey|hello|ola+)(?:\s+(?:como estan|como estas|que tal|a todos))?$/.test(simple))
+    return '¡Hola! Bienvenido a RPV Construcciones. 😊 ¿Te interesan nuestras tinajas, calderas o estufas a pellets?';
+  if(/^(?:gracias+|muchas gracias|mil gracias|te agradezco|vale gracias|perfecto gracias)$/.test(simple))
+    return '¡De nada! ¿Hay algo más en lo que te pueda orientar?';
+  if(/^(?:adios|chao+|chau+|hasta luego|nos vemos|que estes bien|hasta pronto)$/.test(simple))
+    return '¡Hasta pronto! Gracias por contactar a RPV Construcciones.';
+  if(/^(?:ok|okay|vale|perfecto|entendido|ya|de acuerdo|listo)$/.test(simple))
+    return 'Perfecto. ¿Te gustaría consultar otro producto o necesitas una cotización?';
+  return null;
+}
+function repeatedResponse(question, reply){
+  const intent=norm(question).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  if(intent && intent===previousIntent && reply===previousReply){
+    repeatCount++;
+    if(repeatCount===1)return 'Claro, te lo confirmo: '+reply;
+    return 'Es la misma información que te indiqué anteriormente. Si necesitas un dato distinto, dime qué detalle quieres aclarar; también puedes confirmarlo con nuestro equipo.';
+  }
+  previousIntent=intent;previousReply=reply;repeatCount=0;
+  return reply;
+}
+
 const TEAM_ACTION=$('teamAction'),LOCATION_SAVE_ACTION=$('locationSaveAction');
 const whatsappFor=question=>'https://wa.me/56964170206?text='+encodeURIComponent('Hola, estaba conversando con el Asistente RPV en su sitio web. Mi consulta es: '+question);
 const GREETING='¡Hola! Soy el Asistente RPV. Puedo orientarte utilizando nuestra información de productos. ¿Qué deseas consultar?';
@@ -209,7 +302,9 @@ let customerLocation=null,locationRequestToken=0;
 let locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));
 const sentLocationCaptures=new Set();
 async function persistLocation(data,captureId){
-  if(!data||!Number.isFinite(data.latitud)||!Number.isFinite(data.longitud)||sentLocationCaptures.has(captureId))return false;
+  if(!data||sentLocationCaptures.has(captureId))return false;
+  const gps=Number.isFinite(data.latitud)&&Number.isFinite(data.longitud);
+  if(!gps&&!(data.fuente_ubicacion==='manual'&&data.comuna&&data.region))return false;
   sentLocationCaptures.add(captureId);
   try{
     const response=await fetch('/api/guardar-ubicacion.php',{
@@ -271,7 +366,7 @@ function offerLocation(question){
   const token=++locationRequestToken;
   const panel=document.createElement('div');panel.className='location-request';
   const prompt=document.createElement('p');prompt.textContent='Para orientar tu consulta según tu zona, puedes compartir tu ubicación o indicar tu comuna y región.';
-  const note=document.createElement('div');note.className='location-note';note.textContent='Compartir tu ubicación es opcional. Si eliges «Compartir mi ubicación» y permites el acceso del navegador, RPV guardará automáticamente la comuna, provincia, región, coordenadas y precisión para gestionar tu consulta. Las coordenadas también se consultan en servicios externos para identificar tu zona. WhatsApp es independiente.';
+  const note=document.createElement('div');note.className='location-note';note.textContent='Compartir tu ubicación es opcional. Si eliges «Compartir mi ubicación» y permites el acceso del navegador, RPV guardará automáticamente la comuna, provincia, región, coordenadas y precisión para gestionar tu consulta. Las coordenadas también se consultan en servicios externos para identificar tu zona. Si escribes tu comuna y región y pulsas «Usar esta ubicación», RPV también las guardará, sin coordenadas GPS. WhatsApp es independiente.';
   const actions=document.createElement('div');actions.className='location-actions';
   const locate=document.createElement('button');locate.type='button';locate.textContent='📍 Compartir mi ubicación';
   const manual=document.createElement('div');manual.className='location-manual';
@@ -289,10 +384,7 @@ function offerLocation(question){
     anchorResponse(message);
     LOCATION_SAVE_ACTION.replaceChildren();
     LOCATION_SAVE_ACTION.classList.remove('has-action');
-    if(!data||!Number.isFinite(data.latitud)||!Number.isFinite(data.longitud)){
-      // Sin coordenadas no hay insercion: la ubicacion manual permanece disponible para WhatsApp.
-      return;
-    }
+    if(!data)return;
     // El usuario ya eligio compartir ubicación tras leer el aviso de almacenamiento.
     // No requerir una segunda confirmacion: guardar inmediatamente.
     const captureId=window.crypto?.randomUUID?.()||('cap-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -308,10 +400,15 @@ function offerLocation(question){
   let pendingCoordinates=null;
   save.addEventListener('click',()=>{
     const value=input.value.trim();if(!value){input.focus();return;}
-    const raw=value.split(',').map(x=>x.trim()).filter(Boolean);
+    const raw=value.split(',').map(x=>x.trim());
+    if(raw.length!==2||!raw[0]||!raw[1]){
+      note.textContent='Escribe comuna y región separadas por una coma. Ejemplo: Santiago, Región Metropolitana.';
+      input.focus();return;
+    }
     const prior=customerLocation?.data||pendingCoordinates;
-    const data=prior?{...prior,comuna:raw[0]||prior.comuna,region:raw[1]||prior.region}:null;
-    const coords=prior?' Coordenadas: '+prior.latitud.toFixed(5)+', '+prior.longitud.toFixed(5)+'. Mapa: '+prior.url_google_maps+'.':'';
+    const gps=prior&&Number.isFinite(prior.latitud)&&Number.isFinite(prior.longitud);
+    const data=gps?{...prior,comuna:raw[0],region:raw[1]}:{comuna:raw[0],region:raw[1],provincia:null,pais:'Chile',latitud:null,longitud:null,precision_metros:null,url_google_maps:null,fuente_ubicacion:'manual'};
+    const coords=gps?' Coordenadas: '+prior.latitud.toFixed(5)+', '+prior.longitud.toFixed(5)+'. Mapa: '+prior.url_google_maps+'.':'';
     confirmLocation('Comuna y región indicadas por el cliente: '+value+'.'+coords,data);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save.click();}});
@@ -501,17 +598,13 @@ function clearConversation(){
   hidePinnedQuestion();
   add(GREETING,false);
   M.scrollTop=0;
-  Q.value='';last='';pendingMeasure=null;calderaVolume=null;unconfirmedVolume=null;customerLocation=null;locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));++locationRequestToken;
+  Q.value='';last='';previousIntent='';previousReply='';repeatCount=0;awaitingCatalogChoice=false;pendingMeasure=null;calderaVolume=null;unconfirmedVolume=null;customerLocation=null;locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));++locationRequestToken;
   WA.href='https://wa.me/56964170206?text='+encodeURIComponent('Hola, estaba conversando con el Asistente RPV en su sitio web y quisiera continuar por WhatsApp.');
   Q.focus({preventScroll:true});
 }
-let catalogSendGeneration=0;
-$('clearChat').addEventListener('click',()=>{++catalogSendGeneration;clearConversation();});
+$('clearChat').addEventListener('click',clearConversation);
 async function send(t){
   t=t.trim();if(!t)return;
-  const generation=++catalogSendGeneration;
-  await loadKnowledge();
-  if(generation!==catalogSendGeneration||!C.classList.contains('open'))return;
   stopTyping(true);
   last=t;
   M.querySelectorAll('.location-request,.team-confirmation').forEach(el=>el.remove());
@@ -523,11 +616,23 @@ async function send(t){
   currentQuestion.classList.add('current-question');
   showPinnedQuestion(t);
   M.scrollTop=M.scrollHeight;
+  const isCatalog=catalogIntent(t);
+  const selectedCatalog=awaitingCatalogChoice?catalogChoice(t):null;
+  const conversational=isCatalog?CATALOG_REPLY:selectedCatalog?catalogChoiceReply(selectedCatalog):conversationalResponse(t);
+  if(conversational){
+    awaitingCatalogChoice=isCatalog;
+    if(selectedCatalog)pendingMeasure=selectedCatalog==='tinaja'?'tinaja_personas':selectedCatalog==='caldera'?'litros':'m2';
+    if(!selectedCatalog)pendingMeasure=isCatalog?'producto':null;
+    updateWhatsappQuestion(t);Q.value='';
+    typeAssistant(conversational);
+    return;
+  }
+  awaitingCatalogChoice=false;
+  await loadKnowledge();
   const entered=numericInput(t);
   const previousContext=pendingMeasure;
-  const commercialReply=window.RPVCatalogo.answer(t);
   let reply=null,route=null,nextContext=null;
-  if(commercialReply!==null){reply=commercialReply;}else if(previousContext==='confirmar_litros'){
+  if(previousContext==='confirmar_litros'){
     route=volumeConfirmationReply(t);
     if(route){reply=route.reply;nextContext=route.next;}
   }else if(previousContext==='caldera_tipo_aplicacion'){
@@ -556,11 +661,11 @@ async function send(t){
         }
       }
     }
-    else if(previousContext&&entered)reply=measureAnswer(entered,previousContext);
+    else if(previousContext&&entered&&['litros','m2'].includes(previousContext))reply=measureAnswer(entered,previousContext);
   }
   if(!reply)reply=respond(t);
   pendingMeasure=nextContext;
-  if(commercialReply===null&&nextContext===null){
+  if(nextContext===null){
     if(previousContext==='m2'&&entered&&reply.includes('aislación'))pendingMeasure='aislacion';
     else if(previousContext==='litros'&&entered&&(!entered.unit||entered.unit==='litros')){
       if(unconfirmedVolume!==null)pendingMeasure='confirmar_litros';
@@ -600,73 +705,37 @@ L.addEventListener('click',openChat);$('close').addEventListener('click',closeCh
 function drag(el,handle){let st=null,move=false;handle.addEventListener('pointerdown',e=>{if(e.target.closest('button')&&el!==L)return;const rect=el.getBoundingClientRect();let absolute=getComputedStyle(el).position==='absolute';const bound=absolute?el.offsetParent.getBoundingClientRect():{left:0,top:0,width:innerWidth,height:innerHeight};st={x:e.clientX,y:e.clientY,left:rect.left-bound.left,top:rect.top-bound.top,bound};move=false;handle.setPointerCapture(e.pointerId);});handle.addEventListener('pointermove',e=>{if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;if(Math.abs(dx)+Math.abs(dy)>6)move=true;if(!move)return;el.classList.add('dragged');el.style.left=Math.max(0,Math.min(st.bound.width-el.offsetWidth,st.left+dx))+'px';el.style.top=Math.max(0,Math.min(st.bound.height-el.offsetHeight,st.top+dy))+'px';el.style.right='auto';el.style.bottom='auto';});handle.addEventListener('pointerup',()=>{if(move&&el===L){preventLaunchClick=true;setTimeout(()=>preventLaunchClick=false,180);}st=null;});handle.addEventListener('pointercancel',()=>{st=null;});}drag(L,L);drag(C,$('drag'));requestAnimationFrame(updateSticky);
 })();
 
-/* WEB: muestra solo la tarjeta individual del producto señalado. */
+
+/* RPV: carga diferida de animaciones y tarjetas, sin bloquear el asistente. */
 (()=>{
-  const panel=document.getElementById('productDetailPanel');
-  const cards=[...document.querySelectorAll('#products > .cards > .card')];
-  if(!panel||panel.dataset.disabled==='true'||cards.length!==3)return;
-  const desktop=matchMedia('(min-width:768px) and (hover:hover) and (pointer:fine)');
-  const detail=[
-    'Conoce alternativas de calefacción para tinajas. Nuestro equipo puede orientarte sobre compatibilidad, instalación y opciones para tu proyecto.',
-    'Disfruta momentos de descanso y bienestar al aire libre. Consulta por alternativas, características y opciones adecuadas para tu espacio.',
-    'Una opción para dar calidez y confort a tu hogar. Consulta por modelos, características, instalación y cuidados.'
-  ];
-  let current=null,closeTimer=null;
-  function position(card){
-    const r=card.getBoundingClientRect();
-    const w=panel.offsetWidth,h=panel.offsetHeight;
-    const left=Math.max(12,Math.min(innerWidth-w-12,r.left+(r.width-w)/2));
-    const above=r.top-h-10;
-    const top=above>=12?above:Math.max(12,Math.min(innerHeight-h-12,r.top));
-    panel.style.left=left+'px';panel.style.top=top+'px';
-  }
-  function open(index){
-    if(!desktop.matches)return;
-    clearTimeout(closeTimer);
-    const card=cards[index];
-    if(current!==index){
-      cards.forEach(c=>c.classList.remove('detail-active'));
-      card.classList.add('detail-active');
-      const h=card.querySelector('h3');
-      const intro=card.querySelector('p');
-      const link=card.querySelector('a');
-      panel.replaceChildren();
-      const body=document.createElement('div');body.className='product-detail-body';
-      const kicker=document.createElement('div');kicker.className='product-detail-kicker';kicker.textContent='Conoce nuestras soluciones';
-      const title=document.createElement('h3');title.textContent=h.textContent;
-      const summary=document.createElement('p');summary.className='product-detail-summary';summary.textContent=intro.textContent;
-      const more=document.createElement('p');more.className='product-detail-extra';more.textContent=detail[index];
-      const divider=document.createElement('div');divider.className='product-detail-divider';
-      const label=document.createElement('p');label.className='product-detail-label';label.textContent='Te asesoramos en';
-      const topics=document.createElement('ul');topics.className='product-detail-topics';
-      const options=[['Compatibilidad','Instalación','Cotización'],['Modelos y opciones','Características','Cotización'],['Modelos y opciones','Instalación','Cotización']];
-      options[index].forEach(value=>{const item=document.createElement('li');item.textContent=value;topics.append(item)});
-      const action=link.cloneNode(true);const actionLabel=action.querySelector('span');if(actionLabel)actionLabel.textContent='Consultar por WhatsApp';
-      body.append(kicker,title,summary,more,divider,label,topics,action);panel.append(body);
-      current=index;
+  'use strict';
+  const version='20261125-optimizado';
+  const load=(key,file)=>{
+    if(window[key])return;
+    window[key]=true;
+    const script=document.createElement('script');
+    script.src='/assets/js/'+file+'?v='+version;
+    script.async=true;
+    script.onerror=()=>{window[key]=false;console.warn('RPV: no se pudo cargar '+file);};
+    document.head.appendChild(script);
+  };
+  const hero=document.querySelector('.hero .hero-effects');
+  if(hero){
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver(entries=>{
+        if(entries.some(entry=>entry.isIntersecting)){
+          observer.disconnect();
+          load('__rpvHeroEffectsLoaded','hero-effects-rpv.js');
+        }
+      },{rootMargin:'150px 0px'});
+      observer.observe(hero);
+    }else{
+      load('__rpvHeroEffectsLoaded','hero-effects-rpv.js');
     }
-    panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');
-    position(card);
   }
-  function close(){
-    clearTimeout(closeTimer);current=null;
-    panel.classList.remove('is-open');panel.setAttribute('aria-hidden','true');
-    cards.forEach(c=>c.classList.remove('detail-active'));
+  if(document.getElementById('productDetailPanel')){
+    const start=()=>load('__rpvProductCardsLoaded','product-cards-rpv.js');
+    if('requestIdleCallback' in window)requestIdleCallback(start,{timeout:1800});
+    else setTimeout(start,200);
   }
-  function delayClose(){clearTimeout(closeTimer);closeTimer=setTimeout(()=>{
-    if(!panel.matches(':hover')&&!cards.some(c=>c.matches(':hover')||c.contains(document.activeElement))&&!panel.contains(document.activeElement))close();
-  },210)}
-  cards.forEach((card,index)=>{
-    card.addEventListener('pointerenter',()=>open(index));
-    card.addEventListener('pointerleave',delayClose);
-    card.addEventListener('focusin',()=>open(index));
-    card.addEventListener('focusout',delayClose);
-  });
-  panel.addEventListener('pointerenter',()=>clearTimeout(closeTimer));
-  panel.addEventListener('pointerleave',delayClose);
-  panel.addEventListener('focusout',delayClose);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-  desktop.addEventListener('change',close);
-  window.addEventListener('scroll',()=>{if(current!==null){const r=cards[current].getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)close();else position(cards[current])}},{passive:true});
-  window.addEventListener('resize',()=>{if(current!==null){if(!desktop.matches)close();else position(cards[current])}},{passive:true});
 })();

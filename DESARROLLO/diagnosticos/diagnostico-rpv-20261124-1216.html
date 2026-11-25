@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Diagnóstico local RPV Construcciones — 24-11-2026</title>
+  <style>
+    :root{--ink:#183126;--muted:#5a6c61;--green:#245b3d;--green2:#eaf3ec;--gold:#bf7b26;--sand:#f5f2eb;--line:#dbe3dc;--red:#a42d2d;--amber:#8a570d;--blue:#24527a}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--sand);color:var(--ink);font:16px/1.58 system-ui,-apple-system,"Segoe UI",sans-serif}main{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:38px 0 72px}header{padding:30px;border-radius:18px;background:linear-gradient(135deg,#173d2a,#2d6948);color:#fff;box-shadow:0 14px 36px #173d2a24}h1{margin:5px 0 8px;font-size:clamp(30px,5vw,50px);line-height:1.04}h2{margin:0 0 16px;font-size:clamp(23px,3vw,31px);line-height:1.2}h3{margin:0 0 8px;font-size:19px}.eyebrow{font-size:14px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#f0c88f}.lead{max-width:820px;margin:0;color:#e5efe8}.meta{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}.chip,.status,.severity{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;font-size:14px;font-weight:750}.chip{background:#ffffff18;border:1px solid #ffffff40}.section{margin-top:26px;padding:26px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 6px 22px #1831260b}.notice{border-left:5px solid var(--gold);padding:14px 16px;background:#fff6e8;border-radius:7px}.score-grid{display:grid;grid-template-columns:210px 1fr;gap:25px;align-items:center}.score{width:180px;height:180px;display:grid;place-items:center;border:16px solid #d8e8dc;border-top-color:var(--green);border-right-color:var(--green);border-radius:50%;font-size:43px;font-weight:900}.score small{display:block;margin-top:-45px;font-size:14px;color:var(--muted);text-align:center}.bars{display:grid;gap:10px}.bar-row{display:grid;grid-template-columns:150px 1fr 52px;gap:10px;align-items:center}.bar{height:11px;background:#e8ece8;border-radius:20px;overflow:hidden}.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--green),#65a176)}.top-five{display:grid;gap:12px;counter-reset:item}.finding{position:relative;padding:17px 17px 17px 58px;border:1px solid var(--line);border-radius:12px;background:#fbfcfa}.finding:before{counter-increment:item;content:counter(item);position:absolute;left:16px;top:17px;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--ink);color:#fff;font-weight:850}.finding p{margin:5px 0}.status.verified{background:#e8f3ec;color:#1e633d}.status.unverified{background:#edf1f5;color:#35536d}.status.recommendation{background:#fff0d9;color:#7d4a05}.severity.critical{background:#fde8e8;color:var(--red)}.severity.high{background:#fff0d9;color:var(--amber)}.severity.medium{background:#e9f0f8;color:var(--blue)}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}table{width:100%;border-collapse:collapse;min-width:760px}caption{text-align:left;padding:13px 14px;background:#eef4ef;font-weight:800}th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#f7f9f7;font-size:14px}tbody tr:last-child td{border-bottom:0}code{padding:2px 5px;border-radius:5px;background:#edf2ee;color:#234b34;font:13px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere}.yes{color:#17613a;font-weight:800}.partial{color:#86520c;font-weight:800}.no{color:#9a2929;font-weight:800}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.action{padding:18px;border-radius:12px;background:var(--green2);border:1px solid #cfe0d2}.action strong{display:block;margin-bottom:6px}.small{font-size:14px;color:var(--muted)}ul{padding-left:21px}a{color:#205f3d}a:focus-visible{outline:3px solid #d59c4d;outline-offset:3px}@media(max-width:760px){main{width:min(100% - 20px,1120px);padding-top:10px}header,.section{padding:20px}.score-grid{grid-template-columns:1fr}.score{margin:auto}.bar-row{grid-template-columns:112px 1fr 42px;font-size:14px}.actions{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{body{background:#fff}main{width:100%;padding:0}.section,header{box-shadow:none;break-inside:avoid}.table-wrap{overflow:visible}table{min-width:0;font-size:11px}a{color:inherit;text-decoration:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Auditoría local · RPV Construcciones</div>
+    <h1>Diagnóstico del sitio</h1>
+    <p class="lead">Evaluación de conversión, contenido, SEO, experiencia, accesibilidad, calidad técnica, analítica y arquitectura realizada exclusivamente sobre el entorno local autorizado.</p>
+    <div class="meta"><span class="chip">24 de noviembre de 2026 · 12:16</span><span class="chip">Entorno: DESARROLLO</span><span class="chip">Base: http://localhost:8000</span></div>
+  </header>
+
+  <section class="section" id="alcance">
+    <h2>1. Alcance y método</h2>
+    <p class="notice"><strong>Alcance estricto:</strong> se inspeccionaron únicamente archivos bajo <code>DESARROLLO</code> y respuestas de <code>http://localhost:8000</code>. Producción, el sitio público, localhost:8081 y sitios de terceros no están cubiertos por este diagnóstico.</p>
+    <p>Se revisaron las rutas <code>/</code>, <code>/calderas/</code>, <code>/tinajas/</code>, <code>/estufas-a-pellets/</code>, <code>/guia-caldera/</code>, <code>/opiniones/</code> y <code>/api/catalogo.php</code>; todas respondieron HTTP 200 al momento de la comprobación. También se validaron 34 referencias internas de navegación y recursos sin detectar respuestas fallidas.</p>
+    <ul>
+      <li><span class="status verified">Verificado</span> evidencia reproducible en código local o respuesta HTTP local.</li>
+      <li><span class="status unverified">No verificable localmente</span> requiere datos de negocio, usuarios reales, producción o herramientas externas.</li>
+      <li><span class="status recommendation">Recomendación</span> propuesta fundada que necesita decisión o validación humana.</li>
+    </ul>
+  </section>
+
+  <section class="section" id="resumen">
+    <h2>2. Resumen ejecutivo</h2>
+    <p>El sitio local tiene una base comercial sólida: las tres familias de productos cuentan con fichas, CTA de WhatsApp, condiciones de instalación/despacho/garantía, navegación cruzada y datos estructurados válidos. Las rutas principales, los recursos internos y la API están operativos.</p>
+    <p>El riesgo más urgente es comercial: el catálogo local expone valores aprobados muy dispares —por ejemplo, Caldera B a $222 CLP, Tinaja de 7 personas a $111.111 CLP y Estufa a pellets a $3.333 CLP— que podrían ser datos de prueba. No es posible determinar localmente si son correctos; deben ser confirmados por una persona responsable antes de publicar o utilizar este conjunto de datos.</p>
+    <p>Las oportunidades técnicas más claras están en la navegación móvil de Calderas, la indexabilidad de la guía, el tamaño de textos operativos en la portada, la reserva de espacio de imágenes y la recuperación de las pruebas automatizadas del catálogo.</p>
+  </section>
+
+  <section class="section" id="puntaje">
+    <h2>3. Puntaje general: 78/100</h2>
+    <div class="score-grid">
+      <div class="score" aria-label="78 de 100">78<small>de 100</small></div>
+      <div class="bars">
+        <div class="bar-row"><span>Conversión</span><div class="bar"><span style="width:75%"></span></div><strong>15/20</strong></div>
+        <div class="bar-row"><span>Contenido</span><div class="bar"><span style="width:80%"></span></div><strong>16/20</strong></div>
+        <div class="bar-row"><span>SEO on-page</span><div class="bar"><span style="width:87%"></span></div><strong>13/15</strong></div>
+        <div class="bar-row"><span>UX y acceso</span><div class="bar"><span style="width:76%"></span></div><strong>13/17</strong></div>
+        <div class="bar-row"><span>Técnica</span><div class="bar"><span style="width:80%"></span></div><strong>12/15</strong></div>
+        <div class="bar-row"><span>Analítica</span><div class="bar"><span style="width:63%"></span></div><strong>5/8</strong></div>
+        <div class="bar-row"><span>Arquitectura</span><div class="bar"><span style="width:80%"></span></div><strong>4/5</strong></div>
+      </div>
+    </div>
+    <p class="small">El puntaje expresa el estado del entorno local observado; no representa resultados comerciales ni rendimiento de producción.</p>
+  </section>
+
+  <section class="section" id="top5">
+    <h2>4. Cinco hallazgos prioritarios</h2>
+    <div class="top-five">
+      <article class="finding"><h3>Validar precios aprobados antes de cualquier publicación <span class="severity critical">Crítica</span></h3><p><span class="status recommendation">Recomendación</span> El catálogo devuelve Caldera B $222, Tinaja 7 personas $111.111 y Estufa $3.333, entre otros valores. La API los marca aprobados y las vistas consumen la tabla.</p><p><strong>Evidencia:</strong> <code>/api/catalogo.php</code>, productos <code>caldera-tipo-b</code>, <code>tinaja-7-personas</code> y <code>estufa-pellet</code>. Impacto 5/5 · esfuerzo 1/5.</p></article>
+      <article class="finding"><h3>Restituir la navegación de productos en móvil para Calderas <span class="severity high">Alta</span></h3><p><span class="status verified">Verificado</span> bajo 780 px se ocultan todos los enlaces del encabezado salvo contacto. Esto elimina acceso directo a Tinajas, Estufas y anclas de contenido.</p><p><strong>Evidencia:</strong> <code>DESARROLLO/Web/calderas/editorial.css:91</code>, regla <code>.c-nav-links a:not(.c-nav-contact){display:none}</code>. Impacto 4/5 · esfuerzo 2/5.</p></article>
+      <article class="finding"><h3>Completar SEO de la guía de Calderas <span class="severity high">Alta</span></h3><p><span class="status verified">Verificado</span> la guía contiene tres H1 y carece de meta description, canonical y JSON-LD; además no aparece en <code>sitemap.xml</code>. Es una pieza útil enlazada desde la ficha, pero su señal semántica es débil.</p><p><strong>Evidencia:</strong> <code>DESARROLLO/Web/guia-caldera/index.html:50</code> y <code>DESARROLLO/Web/sitemap.xml</code>. Impacto 4/5 · esfuerzo 2/5.</p></article>
+      <article class="finding"><h3>Subir textos operativos de portada a la escala 14/16 px <span class="severity high">Alta</span></h3><p><span class="status verified">Verificado</span> descripciones, datos, botones y controles del asistente usan entre 10 y 13 px. Esto reduce legibilidad y no cumple la pauta editorial solicitada de etiquetas regulares a 14 px y texto principal a 16 px.</p><p><strong>Evidencia:</strong> <code>DESARROLLO/Web/index.html:35-211</code> y <code>DESARROLLO/Web/assets/css/inicio-acompanamiento.css:4-114</code>. Impacto 4/5 · esfuerzo 2/5.</p></article>
+      <article class="finding"><h3>Reservar dimensiones intrínsecas de imágenes <span class="severity medium">Media</span></h3><p><span class="status verified">Verificado</span> 13 imágenes no declaran simultáneamente ancho y alto: 9 en portada, 2 en Calderas y 2 en la guía. Esto puede producir desplazamientos de contenido durante la carga.</p><p><strong>Evidencia:</strong> <code>DESARROLLO/Web/index.html</code>, <code>DESARROLLO/Web/calderas/index.html</code> y <code>DESARROLLO/Web/guia-caldera/index.html</code>. Impacto 3/5 · esfuerzo 2/5.</p></article>
+    </div>
+  </section>
+
+  <section class="section" id="productos">
+    <h2>5. Matriz de producto y conversión</h2>
+    <div class="table-wrap"><table><caption>Cobertura de información por familia</caption><thead><tr><th scope="col">Criterio</th><th scope="col">Calderas</th><th scope="col">Tinajas</th><th scope="col">Estufas a pellets</th></tr></thead><tbody>
+      <tr><th scope="row">Precio o cotización</th><td class="yes">Sí · dato dinámico</td><td class="yes">Sí · dato dinámico</td><td class="yes">Sí · precio registrado</td></tr>
+      <tr><th scope="row">Especificaciones</th><td class="yes">Sí</td><td class="yes">Sí</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">Incluye</th><td class="yes">Sí</td><td class="yes">Sí</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">Instalación</th><td class="yes">Sí</td><td class="yes">Sí</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">Despacho</th><td class="yes">Sí</td><td class="yes">Sí</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">Garantía</th><td class="yes">Sí</td><td class="yes">Sí</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">Preguntas frecuentes</th><td class="no">No</td><td class="no">No</td><td class="yes">Sí</td></tr>
+      <tr><th scope="row">CTA principal</th><td class="yes">Sí · WhatsApp</td><td class="yes">Sí · WhatsApp</td><td class="yes">Sí · WhatsApp</td></tr>
+      <tr><th scope="row">Evidencia técnica</th><td class="partial">Parcial · guía y fichas</td><td class="partial">Parcial · medidas e imágenes</td><td class="partial">Parcial · instrucciones e imágenes</td></tr>
+      <tr><th scope="row">Productos complementarios</th><td class="partial">Sí · navegación</td><td class="partial">Sí · navegación y Calderas</td><td class="partial">Sí · navegación</td></tr>
+    </tbody></table></div>
+    <p><span class="status recommendation">Recomendación</span> Incorporar FAQ breves y verificadas en Calderas y Tinajas para resolver objeciones antes del contacto. Impacto 3/5 · esfuerzo 2/5.</p>
+  </section>
+
+  <section class="section" id="detalle">
+    <h2>6. Observaciones por área</h2>
+    <h3>SEO y contenido</h3>
+    <p><span class="status verified">Verificado</span> Portada y las tres fichas principales tienen un H1, meta description, canonical y JSON-LD válido. Todas las imágenes inspeccionadas incluyen atributo <code>alt</code>. El sitemap cubre las cuatro rutas comerciales principales. La página Opiniones usa <code>noindex, nofollow</code>, coherente con su función de captura.</p>
+    <h3>UX y accesibilidad</h3>
+    <p><span class="status verified">Verificado</span> Hay estilos de foco visible, objetivos de acción generalmente entre 44 y 50 px, alternativas por botón para el visor arrastrable y tratamiento de movimiento reducido en portada, Calderas, Estufas y Opiniones. La navegación móvil de Calderas y los textos pequeños de portada son las brechas principales.</p>
+    <h3>Calidad técnica</h3>
+    <p><span class="status verified">Verificado</span> Las rutas auditadas, la API y 34 referencias internas respondieron correctamente. El lint de PHP finalizó sin errores. La comprobación de sintaxis JavaScript no pudo ejecutarse porque <code>node</code> no está disponible en la sesión actual.</p>
+    <p><span class="status verified">Verificado</span> Las dos pruebas automatizadas del catálogo fallan localmente: <code>DESARROLLO/tests/catalogo.php</code> no encuentra la dependencia temporal <code>BaseDatos/conexion_rpv.php</code>, y <code>DESARROLLO/tests/catalogo_web.py</code> falla al crear/verificar la sesión de prueba. Impacto 3/5 · esfuerzo 2/5.</p>
+    <h3>Analítica</h3>
+    <p><span class="status verified">Verificado</span> Las páginas comerciales incluyen GA4 <code>G-TGRT8J87TP</code> y eventos para clics de WhatsApp; la portada añade eventos del asistente. <span class="status unverified">No verificable localmente</span> no se comprobó recepción efectiva en GA4, calidad de atribución, conversiones reales ni consentimiento en producción.</p>
+    <h3>Arquitectura</h3>
+    <p><span class="status verified">Verificado</span> El catálogo centraliza precios y condiciones, y las familias están enlazadas entre sí. La portada conserva una cantidad elevada de CSS embebido y reglas superpuestas, lo que aumenta el costo de mantenimiento. <span class="status recommendation">Recomendación</span> consolidar gradualmente estilos de portada sin alterar su resultado visual. Impacto 2/5 · esfuerzo 3/5.</p>
+  </section>
+
+  <section class="section" id="backlog">
+    <h2>7. Backlog priorizado</h2>
+    <div class="table-wrap"><table><caption>Acciones propuestas ordenadas por riesgo y valor</caption><thead><tr><th scope="col">Prioridad</th><th scope="col">Acción</th><th scope="col">Tipo</th><th scope="col">Evidencia</th><th scope="col">Impacto</th><th scope="col">Esfuerzo</th></tr></thead><tbody>
+      <tr><td>P0</td><td>Confirmar o corregir cada precio aprobado de la tabla</td><td>Recomendación</td><td><code>/api/catalogo.php</code></td><td>5</td><td>1</td></tr>
+      <tr><td>P1</td><td>Crear menú móvil accesible en Calderas</td><td>Verificado</td><td><code>calderas/editorial.css:91</code></td><td>4</td><td>2</td></tr>
+      <tr><td>P1</td><td>Corregir jerarquía y metadatos de la guía; decidir inclusión en sitemap</td><td>Verificado</td><td><code>guia-caldera/index.html</code></td><td>4</td><td>2</td></tr>
+      <tr><td>P1</td><td>Aplicar escala mínima 14/16 px en contenido operativo de portada</td><td>Verificado</td><td><code>index.html</code> y <code>inicio-acompanamiento.css</code></td><td>4</td><td>2</td></tr>
+      <tr><td>P2</td><td>Declarar ancho y alto en 13 imágenes</td><td>Verificado</td><td>Portada, Calderas y guía</td><td>3</td><td>2</td></tr>
+      <tr><td>P2</td><td>Reparar fixtures y sesión de las pruebas del catálogo</td><td>Verificado</td><td><code>DESARROLLO/tests/</code></td><td>3</td><td>2</td></tr>
+      <tr><td>P2</td><td>Añadir FAQ verificadas a Calderas y Tinajas</td><td>Recomendación</td><td>Fichas de producto</td><td>3</td><td>2</td></tr>
+      <tr><td>P3</td><td>Consolidar CSS embebido y duplicado de portada</td><td>Recomendación</td><td><code>DESARROLLO/Web/index.html</code></td><td>2</td><td>3</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="section" id="no-verificable">
+    <h2>8. Aspectos no verificables localmente</h2>
+    <ul>
+      <li>Exactitud comercial de precios, stock, plazos, garantías y cobertura de despacho.</li>
+      <li>Recepción y calidad de eventos en GA4, tasa de conversión y rendimiento de campañas.</li>
+      <li>Experiencia real en dispositivos, navegadores y redes no disponibles en esta inspección.</li>
+      <li>Rendimiento Core Web Vitals de usuarios reales y comportamiento de caché/CDN.</li>
+      <li>Indexación, rich results, reputación, posicionamiento y estado del sitio público.</li>
+      <li>Cumplimiento jurídico integral sobre privacidad, cookies, términos y comercio electrónico.</li>
+    </ul>
+  </section>
+
+  <section class="section" id="acciones">
+    <h2>9. Tres acciones inmediatas</h2>
+    <div class="actions">
+      <article class="action"><strong>1. Congelar y validar precios</strong>Revisar los seis registros con responsable comercial; documentar valor, modalidad y fecha de vigencia antes de publicar.</article>
+      <article class="action"><strong>2. Resolver fricción móvil</strong>Restituir navegación en Calderas y subir textos operativos de portada a 14/16 px, comprobando foco y reflujo.</article>
+      <article class="action"><strong>3. Cerrar deuda técnica visible</strong>Completar SEO de la guía, dimensiones de imágenes y pruebas automatizadas del catálogo.</article>
+    </div>
+  </section>
+
+  <section class="section" id="cuadro-resumen">
+    <h2>Cuadro resumen de hallazgos</h2>
+    <div class="table-wrap"><table><caption>Última sección del informe · síntesis ejecutiva</caption><thead><tr><th scope="col">Hallazgo</th><th scope="col">Clasificación</th><th scope="col">Severidad</th><th scope="col">Impacto</th><th scope="col">Esfuerzo</th><th scope="col">Ruta o evidencia</th></tr></thead><tbody>
+      <tr><td>Precios aprobados requieren validación humana</td><td>Recomendación</td><td>Crítica</td><td>5</td><td>1</td><td><code>/api/catalogo.php</code></td></tr>
+      <tr><td>Navegación móvil oculta en Calderas</td><td>Verificado</td><td>Alta</td><td>4</td><td>2</td><td><code>calderas/editorial.css:91</code></td></tr>
+      <tr><td>Guía sin metadatos y con tres H1</td><td>Verificado</td><td>Alta</td><td>4</td><td>2</td><td><code>guia-caldera/index.html</code></td></tr>
+      <tr><td>Textos operativos de 10–13 px en portada</td><td>Verificado</td><td>Alta</td><td>4</td><td>2</td><td><code>Web/index.html</code></td></tr>
+      <tr><td>13 imágenes sin dimensiones intrínsecas</td><td>Verificado</td><td>Media</td><td>3</td><td>2</td><td>Portada, Calderas y guía</td></tr>
+      <tr><td>Pruebas automatizadas del catálogo fallan</td><td>Verificado</td><td>Media</td><td>3</td><td>2</td><td><code>DESARROLLO/tests/</code></td></tr>
+      <tr><td>FAQ ausente en Calderas y Tinajas</td><td>Recomendación</td><td>Media</td><td>3</td><td>2</td><td>Fichas locales</td></tr>
+      <tr><td>Resultados comerciales, GA4 y producción</td><td>No verificable localmente</td><td>Informativa</td><td>—</td><td>—</td><td>Fuera del alcance autorizado</td></tr>
+    </tbody></table></div>
+  </section>
+</main>
+</body>
+</html>

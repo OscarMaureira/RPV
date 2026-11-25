@@ -21,6 +21,22 @@ configuración deben seguir fuera del repositorio y fuera de `public_html`.
 El dominio actual es `https://www.rpvconstrucciones.com/`. Úsalo para las
 pruebas posteriores al despliegue en cPanel.
 
+## Perfil cPanel verificado
+
+Antes de preparar o publicar, lee [CPANEL_PROFILE.md](CPANEL_PROFILE.md). Ese
+archivo contiene el perfil técnico comprobado del hosting y evita repetir la
+auditoría de compatibilidad en cada ejecución.
+
+- Considera verificados los datos estables del servidor mientras el usuario no
+  informe un cambio de proveedor, plan, cuenta, dominio o versión PHP.
+- No vuelvas a solicitar credenciales ni a inspeccionar cPanel para confirmar
+  datos que ya figuren como verificados en el perfil.
+- No confundas compatibilidad del hosting con estado del despliegue. La paridad
+  de archivos, las migraciones pendientes, las rutas públicas y las pruebas
+  funcionales sí deben comprobarse en cada publicación.
+- Si una publicación autorizada modifica el estado productivo, actualiza el
+  perfil y el registro de migraciones con los resultados realmente observados.
+
 Ejecuta desde la raíz del proyecto:
 
 ```powershell
@@ -50,6 +66,10 @@ como raíz del archivo. Nunca sobrescribas respaldos anteriores.
 - El SQL se ejecuta manualmente una vez desde cPanel/phpMyAdmin, seleccionando la base productiva ya configurada. Después de una ejecución exitosa, agrega cada ruta y SHA256 al registro de aplicadas. No marques migraciones como aplicadas antes de ejecutarlas.
 - Si no hay migraciones productivas pendientes, no se genera SQL. La publicación queda marcada como pendiente mientras exista un script SQL por ejecutar.
 - Las migraciones destinadas solo a desarrollo se excluyen del script de cPanel.
+- El estado productivo comprobado el 2026-11-24 contiene únicamente la tabla
+  `ubicaciones_chat`; no contiene todavía las tablas de productos, precios,
+  administración ni testimonios esperadas por el desarrollo actual. Trátalo
+  como despliegue pendiente, no como incompatibilidad del servidor.
 
 ## Alcance
 
@@ -79,10 +99,17 @@ La configuración SMTP global se guarda por separado en
 `/home/rpvconst/.config/rpv/notificaciones.php`, también fuera de `public_html`.
 No copies secretos ni archivos reales de configuración al paquete.
 
-La conexión PDO, la tabla `testimonios` con el campo `correo_privado` y la
-configuración SMTP se consideran ya instaladas en cPanel. El flujo conserva sus
-rutas y valida que el código use esas rutas, sin solicitar ni registrar valores
-secretos.
+La conexión privada `/home/rpvconst/conexion_rpv.php` existe en cPanel y debe
+conservarse fuera de `public_html`. No presupongas que las tablas actuales del
+desarrollo ya existen: el perfil verificado registra el esquema realmente
+observado y las migraciones pendientes deben aplicarse y registrarse antes de
+declarar la publicación terminada.
+
+La infraestructura de correo y la entregabilidad del dominio están verificadas,
+pero una prueba SMTP extremo a extremo implica enviar un mensaje real. No la
+repitas en `/prod`; ejecútala solo con autorización explícita y un destinatario
+de prueba. La configuración SMTP privada debe mantenerse en la ruta externa ya
+definida, sin exponer ni copiar secretos.
 
 La preparación deja `PRODUCCION/Web` listo para `public_html` y el módulo privado
 listo para `/home/rpvconst/modulos/notificaciones`. No publica ni modifica el
@@ -93,3 +120,12 @@ hosting; sube únicamente esos dos artefactos cuando se autorice la publicación
 Reporta el manifiesto generado y confirma si el paquete quedó listo para subir a
 cPanel. Incluye el dominio de producción. Si falla cualquier control, no lo
 declares publicable.
+
+El informe debe distinguir:
+
+1. **Compatibilidad del hosting:** tomada del perfil verificado, sin nueva
+   auditoría salvo cambio informado.
+2. **Paquete preparado:** paridad entre `DESARROLLO` y `PRODUCCION`, sintaxis,
+   recursos, secretos y migraciones generadas.
+3. **Publicación efectiva:** solo confirmable después de subir, aplicar las
+   migraciones y ejecutar las pruebas públicas posteriores al despliegue.

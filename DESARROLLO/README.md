@@ -57,15 +57,10 @@ el host: rutas locales en desarrollo y rutas externas preconfiguradas en cPanel.
 El gestor local `http://localhost:8002/` trabaja solo con la base de desarrollo.
 La administración de la base productiva sigue separada de los archivos públicos.
 
-La migración local para guardar en `testimonios` está en
-`database/migrations/20261113_opiniones_en_testimonios.sql`. Aplicar únicamente
-en HeidiSQL, sesión `RPV Desarrollo 11.4`, base `rpvconst_DataMain_dev` y puerto
-`4444`. Esta migración añade el correo privado y traslada a `testimonios` las
-opiniones que hubiera en la tabla de transición `opiniones_productos`.
-La estructura requerida por producción se declara por separado en
+La estructura requerida por producción se declara en
 `database/migrations/20261112_testimonios_cpanel.sql`; `/prod` la incorpora en un
 SQL ejecutable desde cPanel si aún no está registrada como aplicada. No subas la
-migración local ni archivos SQL a `public_html`.
+archivos SQL a `public_html`.
 
 Los cambios futuros de tablas, columnas o índices se declaran en archivos SQL
 nuevos dentro de `database/migrations/`, con primera línea

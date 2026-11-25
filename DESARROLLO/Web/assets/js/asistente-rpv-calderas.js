@@ -1,5 +1,7 @@
 // Asistente RPV | Version 2026-11-10-7 | ubicacion discreta y guardado automatico
 (()=>{'use strict';
+if(window.__RPV_CHAT_INITIALIZED__)return;
+window.__RPV_CHAT_INITIALIZED__=true;
 const $=id=>document.getElementById(id), L=$('launcher'),C=$('chat'),B=$('backdrop'),M=$('messages'),Q=$('question'),WA=$('chatWa'),S=$('status'),H=$('hint'),anchor=$('anchor'),mobile=matchMedia('(max-width:767px)');
 let sections=[],loaded=false,loadAttempted=false,last='',savedScroll=0,preventLaunchClick=false;
 const stop=new Set('el la los las un una unos unas de del y o a al por para con en es son se que como cuál cuales qué cual quiero saber me mi sus sobre ustedes tienen hay está estan más puedo podrian favor información informacion necesito hola gracias buen buenas producto productos'.split(' '));
@@ -8,27 +10,74 @@ const tok=t=>[...new Set((norm(t).match(/[a-z0-9]+/g)||[]).map(w=>({tinajas:'tin
 const aliases={tinaja:['tinaja','tinas','spa','jacuzzi','banera','bano','agua'],caldera:['caldera','calentador','calefactor','quemador'],pellet:['pellet','estufa','calefaccion','calor'],precio:['precio','valor','costo','cotizacion','cotizar','presupuesto'],envio:['envio','despacho','transporte','region','entrega'],instalacion:['instalacion','montaje','instalar'],garantia:['garantia','reparacion','posventa'],contacto:['contacto','telefono','whatsapp','correo']};
 function expand(words){let out=new Set(words);for(const [key,syn] of Object.entries(aliases)){if(syn.some(w=>out.has(w))) {out.add(key);syn.forEach(w=>out.add(w));}}return out;}
 function parseMarkdown(md){const parts=[];let current=null;for(const line of md.split(/\r?\n/)){let match=line.match(/^#{2,3}\s+(.+)$/);if(match){if(current&&current.text.trim())parts.push(current);current={title:match[1].trim(),text:''};continue;}if(/^#\s+/.test(line)||/^>/.test(line))continue;if(!current)current={title:'Información general',text:''};if(line.trim())current.text+=line.replace(/^[-*]\s*/, '').trim()+'\n';}if(current&&current.text.trim())parts.push(current);return parts;}
-let knowledgePromise=null;
-async function loadKnowledge(){
- if(knowledgePromise)return knowledgePromise;
- S.textContent='Consultando catálogo…';
- knowledgePromise=(async()=>{
-  try{
-   const catalog=await window.RPVCatalogo.load();
-   if(!catalog)throw Error('Catálogo no disponible');
-   sections=parseMarkdown(catalog.conocimiento);
-   if(sections.length<2)throw Error('Conocimiento incompleto');
-   loaded=true;loadAttempted=true;S.classList.remove('is-error');S.textContent='';return true;
-  }catch(e){loaded=false;loadAttempted=false;S.classList.add('is-error');S.textContent='No se pudo consultar el catálogo. Puedes confirmar precios por WhatsApp.';return false;}
-  finally{knowledgePromise=null;}
- })();
- return knowledgePromise;
-}
-function respond(question){
- const commercial=window.RPVCatalogo.answer(question);if(commercial!==null)return commercial;if(!loaded)return 'No pude leer el archivo de conocimiento. Para activar las respuestas desde el .md, abre esta página desde un servidor web (consulta el archivo README). Si lo prefieres, puedes continuar por WhatsApp.';
+async function loadKnowledge(){if(loaded)return;if(loadAttempted)return;loadAttempted=true;S.textContent='Cargando conocimiento…';try{const r=await fetch('/assets/data/conocimiento-rpv.md',{cache:'no-cache'});if(!r.ok)throw Error('HTTP '+r.status);const md=await r.text();sections=parseMarkdown(md);if(sections.length<2)throw Error('Archivo Markdown sin secciones');loaded=true;S.classList.remove('is-error');S.textContent='';}catch(e){loaded=false;S.classList.add('is-error');S.textContent='⚠ Para leer el .md, abre la página desde un servidor local o web';loadAttempted=false;console.warn('RPV knowledge load error',e);}}
+function respond(question){if(!loaded)return 'No pude leer el archivo de conocimiento. Para activar las respuestas desde el .md, abre esta página desde un servidor web (consulta el archivo README). Si lo prefieres, puedes continuar por WhatsApp.';
  const terms=expand(tok(question));let hits=[];for(const sec of sections){const head=expand(tok(sec.title));const text=expand(tok(sec.text));let score=0;for(const term of terms){if(head.has(term))score+=7;else if(text.has(term))score+=1;}if(score>0)hits.push({score,sec});}
  hits.sort((a,b)=>b.score-a.score);if(!hits.length||hits[0].score<2)return 'No encuentro una respuesta específica a esa consulta en nuestra información actual. Para evitar darte datos incorrectos, te recomiendo conversar con nuestro equipo por WhatsApp.';
  let best=hits[0].sec;let chunks=best.text.replace(/\n+/g,' ').split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean);let selected=[];for(let line of chunks){if(line.length>250){selected.push(line.slice(0,245)+'…');continue;}selected.push(line);if(selected.join(' ').length>370)break;}let reply=selected.join(' ');if(reply.length>560)reply=reply.slice(0,557)+'…';return reply;}
+
+// Respuestas conversacionales: se resuelven antes de consultar el catálogo.
+let previousIntent='', previousReply='', repeatCount=0;
+const CATALOG_REPLY='¡Claro! En RPV Construcciones ofrecemos tres líneas de productos:\n\n🔥 Calderas: equipos para temperar agua de tinajas y piscinas pequeñas, según compatibilidad.\n\n🛁 Tinajas: modelos para 4 y 7 personas, para uso familiar o proyectos turísticos.\n\n🏠 Estufas a pellets: calefacción para espacios de aproximadamente 70 m², según las condiciones del recinto.\n\n¿Qué producto te interesa conocer: calderas, tinajas o estufas a pellets?';
+let awaitingCatalogChoice=false, awaitingTinajaPeople=false;
+
+function tinajaPeopleReply(message){
+ const t=norm(message).trim();
+ const m=t.match(/^(?:(?:para|somos|seremos|necesito|quiero|de|unas?|aprox(?:imadamente)?)\s+)?(\d{1,2}|cuatro|seis|siete|cinco|tres|ocho)\s*(?:personas?|puestos?)?[.!]?$/);
+ if(!m)return null;
+ const names={tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8};
+ const n=names[m[1]]||Number(m[1]);
+ if(n===4)return 'Para 4 personas tenemos una tinaja de referencia a $1.450.000 CLP. ¿Quieres conocer sus medidas y equipamiento?';
+ if(n===7)return 'Para 7 personas tenemos una tinaja tipo jacuzzi de referencia a $2.850.000 CLP. ¿Quieres conocer sus características?';
+ if(n===5||n===6)return `Entiendo que buscas una tinaja para ${n} personas. Tenemos modelos para 4 y 7 personas; la de 7 podría ajustarse a tu necesidad. ¿Quieres conocer sus características y precio?`;
+ if(n>=1&&n<=3)return `Para ${n} personas, nuestro modelo más pequeño informado es el de 4 personas. ¿Te gustaría conocer sus características?`;
+ if(n>=8)return `Para ${n} personas, nuestros modelos informados son de hasta 7 personas. Podemos consultar alternativas para tu proyecto. ¿Quieres contactar al equipo?`;
+ return null;
+}
+
+function catalogIntent(message){
+ const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+ if(/\b(precio|precios|cuanto|valor|costo|despacho|garantia|instalacion|medidas|litros|potencia)\b/.test(t))return false;
+ return /^(?:(?:hola|buenas|buenos dias|buenas tardes)\s+)?(?:quiero|quisiera|necesito|me gustaria|podrian|pueden|deseo|busco|me interesa)\s+(?:saber|conocer|informacion|informarme|ver|mirar|que me cuenten|que me muestren)(?:\s+(?:mas|algo|un poco|todo))?\s+(?:de|sobre|acerca de|los|sus|el|la|del|de los|de sus)?\s*(?:productos|catalogo|lo que venden|lo que ofrecen|sus productos|la tienda|rpv)(?:\s+(?:que tienen|disponibles))?$/.test(t)
+ || /^(?:que|cuales)\s+(?:productos|cosas|articulos)\s+(?:tienen|venden|ofrecen|hay|manejan)$/.test(t)
+ || /^(?:productos|catalogo|ver productos|mostrar productos|muestrame los productos|informacion de productos|informacion sobre productos|que venden|que ofrecen|que tienen|cuentame de los productos)$/.test(t);
+}
+function catalogChoice(message){
+ const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:calderas?|calentadores?)(?: a pellets?)?$/.test(t))return 'caldera';
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:tinajas?|tinas?|jacuzzi)(?:s)?$/.test(t))return 'tinaja';
+ if(/^(?:las? |sobre las? |quiero (?:ver|saber de|conocer) las? |me interesan las? )?(?:estufas?)(?: a pellets?)?$/.test(t))return 'estufa';
+ return null;
+}
+function catalogChoiceReply(choice){
+ if(choice==='caldera')return 'Contamos con tres equipos de calderas para temperar agua. Para recomendarte uno, ¿cuántos litros tiene tu tinaja o piscina pequeña?';
+ if(choice==='tinaja')return 'Tenemos tinajas para 4 personas ($1.450.000 CLP de referencia) y 7 personas ($2.850.000 CLP de referencia). Los valores y equipamientos deben confirmarse. ¿Cuál te interesa?';
+ return 'Ofrecemos una estufa a pellets con cobertura referencial de aproximadamente 70 m². ¿Cuántos metros cuadrados necesitas calefaccionar?';
+}
+function conversationalResponse(message){
+  const t=norm(message).replace(/[¡!¿?.,;:]+/g,' ').replace(/\s+/g,' ').trim();
+  const simple=t.replace(/^(?:oye|estimados|estimado|equipo rpv)\s+/,'');
+  if(/^(?:hola+|holi+|holaa+|buenas+|buenos dias|buen dia|buenas tardes|buenas noches|que tal|saludos|hey|hello|ola+)(?:\s+(?:como estan|como estas|que tal|a todos))?$/.test(simple))
+    return '¡Hola! Bienvenido a RPV Construcciones. 😊 ¿Te interesan nuestras tinajas, calderas o estufas a pellets?';
+  if(/^(?:gracias+|muchas gracias|mil gracias|te agradezco|vale gracias|perfecto gracias)$/.test(simple))
+    return '¡De nada! ¿Hay algo más en lo que te pueda orientar?';
+  if(/^(?:adios|chao+|chau+|hasta luego|nos vemos|que estes bien|hasta pronto)$/.test(simple))
+    return '¡Hasta pronto! Gracias por contactar a RPV Construcciones.';
+  if(/^(?:ok|okay|vale|perfecto|entendido|ya|de acuerdo|listo)$/.test(simple))
+    return 'Perfecto. ¿Te gustaría consultar otro producto o necesitas una cotización?';
+  return null;
+}
+function repeatedResponse(question, reply){
+  const intent=norm(question).replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+  if(intent && intent===previousIntent && reply===previousReply){
+    repeatCount++;
+    if(repeatCount===1)return 'Claro, te lo confirmo: '+reply;
+    return 'Es la misma información que te indiqué anteriormente. Si necesitas un dato distinto, dime qué detalle quieres aclarar; también puedes confirmarlo con nuestro equipo.';
+  }
+  previousIntent=intent;previousReply=reply;repeatCount=0;
+  return reply;
+}
+
 const TEAM_ACTION=$('teamAction'),LOCATION_SAVE_ACTION=$('locationSaveAction');
 const whatsappFor=question=>'https://wa.me/56964170206?text='+encodeURIComponent('Hola, estaba conversando con el Asistente RPV en su sitio web. Mi consulta es: '+question);
 const GREETING='¡Hola! Soy el Asistente RPV. Puedo orientarte utilizando nuestra información de productos. ¿Qué deseas consultar?';
@@ -38,7 +87,9 @@ let customerLocation=null,locationRequestToken=0;
 let locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));
 const sentLocationCaptures=new Set();
 async function persistLocation(data,captureId){
-  if(!data||!Number.isFinite(data.latitud)||!Number.isFinite(data.longitud)||sentLocationCaptures.has(captureId))return false;
+  if(!data||sentLocationCaptures.has(captureId))return false;
+  const gps=Number.isFinite(data.latitud)&&Number.isFinite(data.longitud);
+  if(!gps&&!(data.fuente_ubicacion==='manual'&&data.comuna&&data.region))return false;
   sentLocationCaptures.add(captureId);
   try{
     const response=await fetch('/api/guardar-ubicacion.php',{
@@ -100,7 +151,7 @@ function offerLocation(question){
   const token=++locationRequestToken;
   const panel=document.createElement('div');panel.className='location-request';
   const prompt=document.createElement('p');prompt.textContent='Para orientar tu consulta según tu zona, puedes compartir tu ubicación o indicar tu comuna y región.';
-  const note=document.createElement('div');note.className='location-note';note.textContent='Compartir tu ubicación es opcional. Si eliges «Compartir mi ubicación» y permites el acceso del navegador, RPV guardará automáticamente la comuna, provincia, región, coordenadas y precisión para gestionar tu consulta. Las coordenadas también se consultan en servicios externos para identificar tu zona. WhatsApp es independiente.';
+  const note=document.createElement('div');note.className='location-note';note.textContent='Compartir tu ubicación es opcional. Si eliges «Compartir mi ubicación» y permites el acceso del navegador, RPV guardará automáticamente la comuna, provincia, región, coordenadas y precisión para gestionar tu consulta. Las coordenadas también se consultan en servicios externos para identificar tu zona. Si escribes tu comuna y región y pulsas «Usar esta ubicación», RPV también las guardará, sin coordenadas GPS. WhatsApp es independiente.';
   const actions=document.createElement('div');actions.className='location-actions';
   const locate=document.createElement('button');locate.type='button';locate.textContent='📍 Compartir mi ubicación';
   const manual=document.createElement('div');manual.className='location-manual';
@@ -118,10 +169,7 @@ function offerLocation(question){
     anchorResponse(message);
     LOCATION_SAVE_ACTION.replaceChildren();
     LOCATION_SAVE_ACTION.classList.remove('has-action');
-    if(!data||!Number.isFinite(data.latitud)||!Number.isFinite(data.longitud)){
-      // Sin coordenadas no hay insercion: la ubicacion manual permanece disponible para WhatsApp.
-      return;
-    }
+    if(!data)return;
     // El usuario ya eligio compartir ubicación tras leer el aviso de almacenamiento.
     // No requerir una segunda confirmacion: guardar inmediatamente.
     const captureId=window.crypto?.randomUUID?.()||('cap-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -137,10 +185,15 @@ function offerLocation(question){
   let pendingCoordinates=null;
   save.addEventListener('click',()=>{
     const value=input.value.trim();if(!value){input.focus();return;}
-    const raw=value.split(',').map(x=>x.trim()).filter(Boolean);
+    const raw=value.split(',').map(x=>x.trim());
+    if(raw.length!==2||!raw[0]||!raw[1]){
+      note.textContent='Escribe comuna y región separadas por una coma. Ejemplo: Santiago, Región Metropolitana.';
+      input.focus();return;
+    }
     const prior=customerLocation?.data||pendingCoordinates;
-    const data=prior?{...prior,comuna:raw[0]||prior.comuna,region:raw[1]||prior.region}:null;
-    const coords=prior?' Coordenadas: '+prior.latitud.toFixed(5)+', '+prior.longitud.toFixed(5)+'. Mapa: '+prior.url_google_maps+'.':'';
+    const gps=prior&&Number.isFinite(prior.latitud)&&Number.isFinite(prior.longitud);
+    const data=gps?{...prior,comuna:raw[0],region:raw[1]}:{comuna:raw[0],region:raw[1],provincia:null,pais:'Chile',latitud:null,longitud:null,precision_metros:null,url_google_maps:null,fuente_ubicacion:'manual'};
+    const coords=gps?' Coordenadas: '+prior.latitud.toFixed(5)+', '+prior.longitud.toFixed(5)+'. Mapa: '+prior.url_google_maps+'.':'';
     confirmLocation('Comuna y región indicadas por el cliente: '+value+'.'+coords,data);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save.click();}});
@@ -330,17 +383,13 @@ function clearConversation(){
   hidePinnedQuestion();
   add(GREETING,false);
   M.scrollTop=0;
-  Q.value='';last='';customerLocation=null;locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));++locationRequestToken;
+  Q.value='';last='';previousIntent='';previousReply='';repeatCount=0;awaitingCatalogChoice=false;awaitingTinajaPeople=false;customerLocation=null;locationConversationId=(window.crypto?.randomUUID?.()||('rpv-'+Date.now()+'-'+Math.random().toString(36).slice(2)));++locationRequestToken;
   WA.href='https://wa.me/56964170206?text='+encodeURIComponent('Hola, estaba conversando con el Asistente RPV en su sitio web y quisiera continuar por WhatsApp.');
   Q.focus({preventScroll:true});
 }
-let catalogSendGeneration=0;
-$('clearChat').addEventListener('click',()=>{++catalogSendGeneration;clearConversation();});
+$('clearChat').addEventListener('click',clearConversation);
 async function send(t){
   t=t.trim();if(!t)return;
-  const generation=++catalogSendGeneration;
-  await loadKnowledge();
-  if(generation!==catalogSendGeneration||!C.classList.contains('open'))return;
   stopTyping(true);
   last=t;
   M.querySelectorAll('.location-request,.team-confirmation').forEach(el=>el.remove());
@@ -352,7 +401,16 @@ async function send(t){
   currentQuestion.classList.add('current-question');
   showPinnedQuestion(t);
   M.scrollTop=M.scrollHeight;
-  const reply=respond(t);
+  const people=awaitingTinajaPeople?tinajaPeopleReply(t):null;
+  if(people){awaitingTinajaPeople=false;updateWhatsappQuestion(t);Q.value='';typeAssistant(people);return;}
+  const isCatalog=catalogIntent(t);
+  const selectedCatalog=awaitingCatalogChoice?catalogChoice(t):null;
+  const conversational=isCatalog?CATALOG_REPLY:selectedCatalog?catalogChoiceReply(selectedCatalog):conversationalResponse(t);
+  awaitingCatalogChoice=isCatalog;
+  awaitingTinajaPeople=!!(selectedCatalog==='tinaja'||/\b(?:para cuantos personas|para cuantas personas|4 o 7|cuatro o siete)\b/.test(norm(conversational||'')));
+  if(!conversational)await loadKnowledge();
+  const reply=conversational||repeatedResponse(t,respond(t));
+  if(!conversational)awaitingTinajaPeople=/\b(?:para cuantas personas|4 o 7|cuatro o siete)\b/.test(norm(reply));
    updateWhatsappQuestion(t);
    Q.value='';
    const askLocation=needsLocation(t,reply)&&!customerLocation;
@@ -373,238 +431,37 @@ L.addEventListener('click',openChat);$('close').addEventListener('click',closeCh
 function drag(el,handle){let st=null,move=false;handle.addEventListener('pointerdown',e=>{if(e.target.closest('button')&&el!==L)return;const rect=el.getBoundingClientRect();let absolute=getComputedStyle(el).position==='absolute';const bound=absolute?el.offsetParent.getBoundingClientRect():{left:0,top:0,width:innerWidth,height:innerHeight};st={x:e.clientX,y:e.clientY,left:rect.left-bound.left,top:rect.top-bound.top,bound};move=false;handle.setPointerCapture(e.pointerId);});handle.addEventListener('pointermove',e=>{if(!st)return;const dx=e.clientX-st.x,dy=e.clientY-st.y;if(Math.abs(dx)+Math.abs(dy)>6)move=true;if(!move)return;el.classList.add('dragged');el.style.left=Math.max(0,Math.min(st.bound.width-el.offsetWidth,st.left+dx))+'px';el.style.top=Math.max(0,Math.min(st.bound.height-el.offsetHeight,st.top+dy))+'px';el.style.right='auto';el.style.bottom='auto';});handle.addEventListener('pointerup',()=>{if(move&&el===L){preventLaunchClick=true;setTimeout(()=>preventLaunchClick=false,180);}st=null;});handle.addEventListener('pointercancel',()=>{st=null;});}drag(L,L);drag(C,$('drag'));requestAnimationFrame(updateSticky);
 })();
 
-/* Movimiento localizado: SOLO hojas verdes; troncos y construccion inmoviles. */
-(()=>{
-  const hero=document.querySelector('.hero');
-  const canvas=hero?.querySelector('.hero-effects');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d',{alpha:true});
-  if(!ctx)return;
-  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
-  const image=new Image();
-  image.src='/assets/images/backgrounds/fondo.webp';
-  let width=0,height=0,dpr=1,frame=0,running=false,visible=true,last=0;
-  let leaves=[],mobileLeaves=[];
-  // Areas marcadas sobre la imagen original 1600x893. Se excluye el tronco
-  // vertical derecho (aprox. x 1320-1410) y las zonas construidas.
-  const patches=[
-    {x:0,y:0,w:185,h:570,amp:6.5,speed:.91,phase:.1},
-    {x:205,y:0,w:335,h:178,amp:9,speed:1.08,phase:1.5},
-    {x:530,y:0,w:460,h:192,amp:10,speed:.86,phase:3},
-    {x:1175,y:8,w:135,h:355,amp:6,speed:1.03,phase:2.1},
-    {x:1418,y:0,w:182,h:700,amp:7.5,speed:.97,phase:3.7},
-    {x:1220,y:510,w:378,h:300,amp:6.8,speed:.82,phase:4.2}
-  ];
-  // En pantallas estrechas las hojas colgantes oscuras sobre el cielo
-  // requieren mascaras distintas: el verde puro no las detecta.
-  // Son recortes solo de la copa superior, sin incluir ningun tronco.
-  const mobilePatches=[
-    {x:565,y:0,w:105,h:212,amp:58,speed:1.82,phase:.2,mobile:true},
-    {x:652,y:0,w:112,h:240,amp:64,speed:1.66,phase:1.4,mobile:true},
-    {x:745,y:0,w:110,h:238,amp:68,speed:1.92,phase:2.5,mobile:true},
-    {x:837,y:0,w:108,h:228,amp:65,speed:1.75,phase:3.6,mobile:true},
-    {x:920,y:0,w:110,h:212,amp:56,speed:2.03,phase:4.7,mobile:true},
-    {x:1008,y:0,w:85,h:184,amp:48,speed:1.83,phase:5.5,mobile:true}
-  ];  const mobileScreen=window.matchMedia('(max-width:767px)');
-  // Mascaras de vegetacion: conserva solo tonos verdes/verde-amarillentos;
-  // troncos marrones, metal, vidrio y construcciones quedan transparentes.
-  function makePatch(p){
-    const c=document.createElement('canvas');c.width=p.w;c.height=p.h;
-    const g=c.getContext('2d',{willReadFrequently:true});
-    g.drawImage(image,p.x,p.y,p.w,p.h,0,0,p.w,p.h);
-    const im=g.getImageData(0,0,p.w,p.h),d=im.data;
-    for(let i=0;i<d.length;i+=4){
-      const r=d[i],green=d[i+1],blue=d[i+2];
-      const high=Math.max(r,green,blue),low=Math.min(r,green,blue);
-      const chroma=high-low;
-      // Detectar el verde, incluso hojas verde-oliva con luz amarilla.
-      const greenBias=Math.min(green-r*.87,green-blue*.94);
-      let confidence=Math.max(0,Math.min(1,(greenBias-3)/17));
-      confidence*=Math.max(0,Math.min(1,(chroma-12)/27));
-      // En la copa colgante: tambien seleccionar hojas casi negras
-      // recortadas contra el cielo azul, manteniendo transparente el cielo.
-      if(p.mobile){
-        const darkLeaf=Math.max(0,Math.min(1,(148-high)/66));
-        const blueSky=Math.max(0,Math.min(1,(130-blue)/65));
-        const leafTone=Math.max(0,Math.min(1,(green-blue+22)/36));
-        confidence=Math.max(confidence, darkLeaf*blueSky*leafTone);
-      }else if(green<36||greenBias<3)confidence=0;
-      const px=(i/4)%p.w,py=Math.floor(i/4/p.w);
-      const edge=Math.min(px,py,p.w-1-px,p.h-1-py);
-      confidence*=Math.min(1,Math.max(0,edge/16));
-      // Opacidad suficientemente baja para evitar doble imagen artificial.
-      d[i+3]=Math.round(225*confidence);
-    }
-    g.putImageData(im,0,0);
-    return {...p,sprite:c};
-  }
-  function resize(){
-    const r=hero.getBoundingClientRect();
-    width=Math.max(1,r.width);height=Math.max(1,r.height);
-    dpr=Math.min(devicePixelRatio||1,2);
-    canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
-    canvas.style.width=width+'px';canvas.style.height=height+'px';
-  }
-  // Las posiciones de origen siguen el borde superior de la tinaja.
-  const emitters=[
-    {x:702,y:552,phase:.2},{x:767,y:549,phase:1.2},
-    {x:828,y:546,phase:2.2},{x:890,y:548,phase:3.2},
-    {x:948,y:550,phase:4.4},{x:1017,y:550,phase:5.5}
-  ];
-  function draw(ms){
-    if(!running)return;
-    frame=requestAnimationFrame(draw);
-    if(ms-last<33)return;
-    last=ms;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    ctx.clearRect(0,0,width,height);
-    const scale=Math.max(width/image.naturalWidth,height/image.naturalHeight);
-    const ox=(width-image.naturalWidth*scale)*.5;
-    const oy=(height-image.naturalHeight*scale)*.51;
-    const t=ms/1000;
-    // En escritorio se conserva el balanceo suave aprobado.
-    // En movil las hojas colgantes de arriba se mecen de manera evidente.
-    const isMobile=mobileScreen.matches;
-    for(const p of (isMobile?leaves.filter(q=>q.x<205||q.x>1100):leaves)){
-      const sway=Math.sin(t*p.speed+p.phase)*p.amp+Math.sin(t*p.speed*.45+p.phase)*p.amp*.25;
-      const lift=Math.cos(t*p.speed*.75+p.phase)*1.3;
-      ctx.save();ctx.globalAlpha=.84;
-      ctx.drawImage(p.sprite,ox+(p.x+sway)*scale,oy+(p.y+lift)*scale,p.w*scale,p.h*scale);
-      ctx.restore();
-    }
-    if(isMobile){
-      for(const p of mobileLeaves){
-        // Balanceo desde el extremo superior, como ramas con viento.
-        const angle=Math.sin(t*p.speed+p.phase)*.22
-                   +Math.sin(t*p.speed*.51+p.phase*.8)*.065;
-        const drift=(Math.sin(t*p.speed+p.phase)*.84
-                   +Math.sin(t*p.speed*.57+p.phase*.6)*.16)*p.amp;
-        const x=ox+p.x*scale,y=oy+p.y*scale;
-        ctx.save();
-        ctx.globalAlpha=.97;
-        ctx.translate(x+p.w*scale*.5,y);
-        ctx.rotate(angle);
-        ctx.drawImage(p.sprite,-p.w*scale*.5+drift*scale*.50,0,p.w*scale,p.h*scale);
-        ctx.restore();
-      }
-    }
-    // Vapor con corrientes onduladas y nubosidad mas visible sobre el agua.
-    ctx.save();ctx.globalCompositeOperation='screen';
-    for(const e of emitters){
-      for(let n=0;n<9;n++){
-        const progress=(t*.15+n/9+e.phase*.12)%1;
-        const fade=Math.pow(Math.sin(Math.PI*progress),.8);
-        const sway=Math.sin(t*.94+n*.82+e.phase)*35+Math.sin(progress*7+e.phase)*22;
-        const x=ox+(e.x+sway+progress*31)*scale;
-        const y=oy+(e.y-progress*355)*scale;
-        const radius=(20+progress*53)*scale;
-        if(x+radius<0||x-radius>width||y+radius<0||y-radius>height)continue;
-        const alpha=.31*fade;
-        const mist=ctx.createRadialGradient(x,y,0,x,y,radius);
-        mist.addColorStop(0,`rgba(251,253,252,${alpha})`);
-        mist.addColorStop(.35,`rgba(245,250,249,${alpha*.65})`);
-        mist.addColorStop(.8,`rgba(234,244,242,${alpha*.12})`);
-        mist.addColorStop(1,'rgba(234,244,242,0)');
-        ctx.fillStyle=mist;
-        ctx.beginPath();ctx.ellipse(x,y,radius*.72,radius*1.48,Math.sin(t*.42+e.phase)*.14,0,Math.PI*2);ctx.fill();
-      }
-      // Hilo de vapor: trayectoria serpenteante que sube desde la tinaja.
-      const baseX=ox+e.x*scale,baseY=oy+e.y*scale;
-      ctx.beginPath();
-      for(let j=0;j<=16;j++){
-        const f=j/16;
-        const xx=baseX+(Math.sin(t*.7+e.phase+f*5.6)*27+f*36)*scale;
-        const yy=baseY-f*225*scale;
-        if(j===0)ctx.moveTo(xx,yy);else ctx.lineTo(xx,yy);
-      }
-      ctx.strokeStyle='rgba(242,250,248,.09)';ctx.lineWidth=19*scale;ctx.lineCap='round';
-      ctx.filter=`blur(${Math.max(6,12*scale)}px)`;ctx.stroke();ctx.filter='none';
-    }
-    ctx.restore();
-  }
-  function refresh(){
-    const active=!motion.matches&&visible&&image.complete&&image.naturalWidth>0;
-    if(active&&!running){running=true;last=0;frame=requestAnimationFrame(draw)}
-    if(!active&&running){running=false;cancelAnimationFrame(frame);ctx.clearRect(0,0,canvas.width,canvas.height)}
-  }
-  function ready(){leaves=patches.map(makePatch);mobileLeaves=mobilePatches.map(makePatch);resize();refresh()}
-  image.addEventListener('load',ready);
-  if(image.complete&&image.naturalWidth)ready();
-  window.addEventListener('resize',resize,{passive:true});
-  document.addEventListener('visibilitychange',()=>{visible=!document.hidden;refresh()});
-  motion.addEventListener('change',refresh);
-  if('IntersectionObserver'in window){
-    new IntersectionObserver(entries=>{visible=entries[0].isIntersecting&&!document.hidden;refresh()},{threshold:0}).observe(hero);
-  }
-})();
 
-/* WEB: muestra solo la tarjeta individual del producto señalado. */
+/* RPV: carga diferida de animaciones y tarjetas, sin bloquear el asistente. */
 (()=>{
-  const panel=document.getElementById('productDetailPanel');
-  const cards=[...document.querySelectorAll('#products > .cards > .card')];
-  if(!panel||cards.length!==3)return;
-  const desktop=matchMedia('(min-width:768px) and (hover:hover) and (pointer:fine)');
-  const detail=[
-    'Conoce alternativas de calefacción para tinajas. Nuestro equipo puede orientarte sobre compatibilidad, instalación y opciones para tu proyecto.',
-    'Disfruta momentos de descanso y bienestar al aire libre. Consulta por alternativas, características y opciones adecuadas para tu espacio.',
-    'Una opción para dar calidez y confort a tu hogar. Consulta por modelos, características, instalación y cuidados.'
-  ];
-  let current=null,closeTimer=null;
-  function position(card){
-    const r=card.getBoundingClientRect();
-    const w=panel.offsetWidth,h=panel.offsetHeight;
-    const left=Math.max(12,Math.min(innerWidth-w-12,r.left+(r.width-w)/2));
-    const above=r.top-h-10;
-    const top=above>=12?above:Math.max(12,Math.min(innerHeight-h-12,r.top));
-    panel.style.left=left+'px';panel.style.top=top+'px';
-  }
-  function open(index){
-    if(!desktop.matches)return;
-    clearTimeout(closeTimer);
-    const card=cards[index];
-    if(current!==index){
-      cards.forEach(c=>c.classList.remove('detail-active'));
-      card.classList.add('detail-active');
-      const h=card.querySelector('h3');
-      const intro=card.querySelector('p');
-      const link=card.querySelector('a');
-      panel.replaceChildren();
-      const body=document.createElement('div');body.className='product-detail-body';
-      const kicker=document.createElement('div');kicker.className='product-detail-kicker';kicker.textContent='Conoce nuestras soluciones';
-      const title=document.createElement('h3');title.textContent=h.textContent;
-      const summary=document.createElement('p');summary.className='product-detail-summary';summary.textContent=intro.textContent;
-      const more=document.createElement('p');more.className='product-detail-extra';more.textContent=detail[index];
-      const divider=document.createElement('div');divider.className='product-detail-divider';
-      const label=document.createElement('p');label.className='product-detail-label';label.textContent='Te asesoramos en';
-      const topics=document.createElement('ul');topics.className='product-detail-topics';
-      const options=[['Compatibilidad','Instalación','Cotización'],['Modelos y opciones','Características','Cotización'],['Modelos y opciones','Instalación','Cotización']];
-      options[index].forEach(value=>{const item=document.createElement('li');item.textContent=value;topics.append(item)});
-      const action=link.cloneNode(true);const actionLabel=action.querySelector('span');if(actionLabel)actionLabel.textContent='Consultar por WhatsApp';
-      body.append(kicker,title,summary,more,divider,label,topics,action);panel.append(body);
-      current=index;
+  'use strict';
+  const version='20261125-optimizado';
+  const load=(key,file)=>{
+    if(window[key])return;
+    window[key]=true;
+    const script=document.createElement('script');
+    script.src='/assets/js/'+file+'?v='+version;
+    script.async=true;
+    script.onerror=()=>{window[key]=false;console.warn('RPV: no se pudo cargar '+file);};
+    document.head.appendChild(script);
+  };
+  const hero=document.querySelector('.hero .hero-effects');
+  if(hero){
+    if('IntersectionObserver' in window){
+      const observer=new IntersectionObserver(entries=>{
+        if(entries.some(entry=>entry.isIntersecting)){
+          observer.disconnect();
+          load('__rpvHeroEffectsLoaded','hero-effects-rpv.js');
+        }
+      },{rootMargin:'150px 0px'});
+      observer.observe(hero);
+    }else{
+      load('__rpvHeroEffectsLoaded','hero-effects-rpv.js');
     }
-    panel.classList.add('is-open');panel.setAttribute('aria-hidden','false');
-    position(card);
   }
-  function close(){
-    clearTimeout(closeTimer);current=null;
-    panel.classList.remove('is-open');panel.setAttribute('aria-hidden','true');
-    cards.forEach(c=>c.classList.remove('detail-active'));
+  if(document.getElementById('productDetailPanel')){
+    const start=()=>load('__rpvProductCardsLoaded','product-cards-rpv.js');
+    if('requestIdleCallback' in window)requestIdleCallback(start,{timeout:1800});
+    else setTimeout(start,200);
   }
-  function delayClose(){clearTimeout(closeTimer);closeTimer=setTimeout(()=>{
-    if(!panel.matches(':hover')&&!cards.some(c=>c.matches(':hover')||c.contains(document.activeElement))&&!panel.contains(document.activeElement))close();
-  },210)}
-  cards.forEach((card,index)=>{
-    card.addEventListener('pointerenter',()=>open(index));
-    card.addEventListener('pointerleave',delayClose);
-    card.addEventListener('focusin',()=>open(index));
-    card.addEventListener('focusout',delayClose);
-  });
-  panel.addEventListener('pointerenter',()=>clearTimeout(closeTimer));
-  panel.addEventListener('pointerleave',delayClose);
-  panel.addEventListener('focusout',delayClose);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-  desktop.addEventListener('change',close);
-  window.addEventListener('scroll',()=>{if(current!==null){const r=cards[current].getBoundingClientRect();if(r.bottom<0||r.top>innerHeight)close();else position(cards[current])}},{passive:true});
-  window.addEventListener('resize',()=>{if(current!==null){if(!desktop.matches)close();else position(cards[current])}},{passive:true});
 })();

@@ -3,6 +3,7 @@
   'use strict';
   let current = null, pending = null;
   const normalize = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const formatPrice = value => '$' + new Intl.NumberFormat('es-CL', {maximumFractionDigits: 0}).format(Number(value)) + ' CLP';
   const productValue = product => ({...product});
   function get(id) { return current?.productos.find(p => p.id === id) ? productValue(current.productos.find(p => p.id === id)) : null; }
   function list(category) { return (current?.productos || []).filter(p => !category || p.categoria === category).map(productValue); }
@@ -45,8 +46,11 @@
     updateCalderaImages();
     document.querySelectorAll('[data-catalog-product][data-catalog-field]').forEach(element => {
       const p = get(element.dataset.catalogProduct), field = element.dataset.catalogField;
-      if (p) element.textContent = field === 'precio' ? p.precio_texto : p[field] || 'Consultar con el equipo.';
-      else if (field === 'precio') element.textContent = 'Precio a confirmar por WhatsApp';
+      if (p) {
+        if (field === 'precio') element.textContent = p.precio_texto;
+        else if (field === 'precio_registrado') element.textContent = Number.isFinite(Number(p.precio_clp)) ? formatPrice(p.precio_clp) : 'Precio a confirmar por WhatsApp';
+        else element.textContent = p[field] || 'Consultar con el equipo.';
+      } else if (field === 'precio' || field === 'precio_registrado') element.textContent = 'Precio a confirmar por WhatsApp';
     });
   }
   async function load() {

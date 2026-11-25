@@ -35,7 +35,7 @@ function h(string $value): string { return htmlspecialchars($value, ENT_QUOTES |
   <meta name="robots" content="noindex, nofollow"><title>Opiniones de clientes · RPV Construcciones</title>
   <meta name="description" content="Comparte tu experiencia con productos RPV Construcciones.">
   <link rel="preload" href="/assets/images/backgrounds/fondo.webp" as="image" fetchpriority="high">
-  <link rel="stylesheet" href="/opiniones/opiniones.css?v=20261112-3"><script src="/assets/js/hero-effects.js?v=20261112-1" defer></script><script src="/opiniones/opiniones.js?v=20261112-3" defer></script>
+  <link rel="stylesheet" href="/opiniones/opiniones.css?v=20261124-1"><script src="/assets/js/hero-effects.js?v=20261112-1" defer></script><script src="/opiniones/opiniones.js?v=20261112-3" defer></script>
 </head>
 <body>
 <?php require __DIR__ . '/componentes/header.php'; ?>

@@ -51,23 +51,6 @@ ALTER TABLE testimonios
 ALTER TABLE testimonios
   ADD COLUMN IF NOT EXISTS correo_privado VARCHAR(254) NULL AFTER nombre_publico;
 
--- Opiniones de producto recibidas desde el sitio local de desarrollo.
-CREATE TABLE IF NOT EXISTS opiniones_productos (
-  id_opinion BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  nombre_publico VARCHAR(80) NOT NULL,
-  correo_privado VARCHAR(254) NOT NULL,
-  producto VARCHAR(40) NOT NULL,
-  calificacion TINYINT UNSIGNED NOT NULL,
-  comentario VARCHAR(1200) NOT NULL,
-  consentimiento_publicacion TINYINT(1) NOT NULL DEFAULT 0,
-  estado ENUM('pendiente', 'aprobado', 'rechazado') NOT NULL DEFAULT 'pendiente',
-  creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  revisado_en TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY (id_opinion),
-  KEY idx_opiniones_estado_fecha (estado, creado_en),
-  KEY idx_opiniones_producto_estado (producto, estado)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Catálogo comercial local, fuente de las páginas y los asistentes.
 CREATE TABLE IF NOT EXISTS catalogo_productos (
   id_producto VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,

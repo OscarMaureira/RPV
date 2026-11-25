@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagnóstico local RPV — 25 de noviembre de 2026</title>
+  <style>
+    :root{color-scheme:light;--ink:#193428;--muted:#56685d;--paper:#f7f4ed;--card:#fff;--line:#d8e0d8;--green:#276842;--gold:#a86617;--red:#9b2c2c;--amber:#8b5700;--blue:#245b78}
+    *{box-sizing:border-box}html{background:#e7ece6;color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.55}body{margin:0}main{width:min(1120px,calc(100% - 32px));margin:28px auto;background:var(--paper);box-shadow:0 18px 55px rgba(25,52,40,.13)}header{padding:46px clamp(24px,5vw,64px);background:linear-gradient(120deg,#183c2a,#2d6947);color:#fff}header p{max-width:780px;margin:12px 0 0;color:#e1eee6}.eyebrow{font-size:.76rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:#f1c77d}h1{max-width:850px;margin:8px 0 0;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05}h2{margin:0 0 16px;font-size:clamp(1.45rem,3vw,2rem);line-height:1.2}h3{margin:0 0 8px;font-size:1.08rem}section{padding:34px clamp(24px,5vw,64px);border-top:1px solid var(--line)}p{margin:0 0 12px}.lead{font-size:1.08rem}.note{padding:14px 16px;border-left:4px solid var(--gold);background:#fff8e8}.scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:22px}.scope div,.finding,.action-card{padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--card)}.scope strong{display:block;margin-bottom:5px}.score-grid{display:grid;grid-template-columns:1.2fr 2fr;gap:24px;align-items:center}.score-total{display:grid;place-items:center;min-height:190px;border-radius:18px;background:#183c2a;color:#fff;text-align:center}.score-total strong{display:block;font-size:4rem;line-height:1}.score-total span{font-size:.9rem}.score-bars{display:grid;gap:11px}.score-row{display:grid;grid-template-columns:minmax(150px,1fr) 2fr 56px;gap:12px;align-items:center}.bar{height:11px;overflow:hidden;border-radius:999px;background:#dce4dc}.bar i{display:block;height:100%;background:linear-gradient(90deg,#2d754c,#d59a43)}.score-row b{text-align:right}.findings{display:grid;gap:14px}.finding-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}.badges{display:flex;flex-wrap:wrap;gap:7px}.badge{display:inline-flex;padding:3px 9px;border-radius:999px;font-size:.75rem;font-weight:800;border:1px solid currentColor}.critical{color:var(--red);background:#fff1f1}.medium{color:var(--amber);background:#fff8e8}.low{color:var(--blue);background:#eef8fd}.verified{color:#21613d;background:#edf8f0}.recommendation{color:#785000;background:#fff8e8}.not-local{color:#5c4a77;background:#f5f0ff}code{padding:2px 6px;border-radius:5px;background:#edf1ec;color:#264a37;font-family:Consolas,monospace;overflow-wrap:anywhere}.evidence{margin:12px 0;padding:12px 14px;border-radius:8px;background:#f0f3ef;color:#385044;font-size:.9rem}.metrics{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.metric{padding:6px 9px;border-radius:7px;background:#eef3ee;font-size:.8rem;font-weight:700}.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}.table-wrap:focus-visible{outline:3px solid #bd7b1e;outline-offset:3px}table{width:100%;border-collapse:collapse;min-width:760px}caption{padding:14px 16px;text-align:left;font-weight:800;background:#eaf0e9}th,td{padding:12px 14px;border-top:1px solid var(--line);text-align:left;vertical-align:top}th{font-size:.78rem;letter-spacing:.03em;text-transform:uppercase;background:#f6f8f5}td{font-size:.91rem}.yes{color:#17603a;font-weight:800}.partial{color:#8b5700;font-weight:800}.no{color:#9b2c2c;font-weight:800}.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.action-card{border-top:5px solid var(--green)}.action-card .number{display:inline-grid;place-items:center;width:32px;height:32px;margin-bottom:12px;border-radius:50%;background:#dcebdd;color:#1d5938;font-weight:900}.quiet{color:var(--muted)}ul{margin:10px 0 0;padding-left:20px}li+li{margin-top:7px}.summary td:first-child{font-weight:800}.priority-high{color:var(--red);font-weight:800}.priority-medium{color:var(--amber);font-weight:800}.priority-low{color:var(--blue);font-weight:800}a{color:#175b39}a:focus-visible{outline:3px solid #bd7b1e;outline-offset:3px}
+    @media(max-width:760px){main{width:100%;margin:0}.scope,.score-grid,.actions{grid-template-columns:1fr}.score-row{grid-template-columns:1fr 52px}.score-row .bar{grid-column:1/-1;grid-row:2}.score-total{min-height:150px}section{padding-top:28px;padding-bottom:28px}}
+    @media print{html{background:#fff}main{width:100%;margin:0;box-shadow:none}header{background:#fff;color:#193428;border-bottom:3px solid #193428}header p{color:#385044}.eyebrow{color:#8a5a16}section{break-inside:avoid}.finding,.action-card,.table-wrap{box-shadow:none}a{color:inherit;text-decoration:none}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Diagnóstico local · Desarrollo</div>
+    <h1>RPV Construcciones — revisión de conversión, contenido, SEO y experiencia</h1>
+    <p>Informe generado el 25 de noviembre de 2026 a partir del código local y de una revisión visual aislada en escritorio y móvil.</p>
+  </header>
+
+  <section aria-labelledby="alcance">
+    <h2 id="alcance">Alcance</h2>
+    <p class="lead">Se revisó únicamente <code>DESARROLLO/Web</code> y la vista local <code>http://localhost:8000</code>.</p>
+    <div class="scope">
+      <div><strong>Incluido</strong>Estructura, navegación, fichas, CTA, metadatos, schema presente, recursos locales, PHP, experiencia visual, foco, reflujo móvil y analítica implementada.</div>
+      <div><strong>Excluido expresamente</strong>Producción, sitio público, cPanel, buscadores, competidores, ventas, stock, tráfico y resultados reales de conversión.</div>
+    </div>
+    <p class="note" style="margin-top:18px"><strong>Advertencia:</strong> este diagnóstico no cubre <code>PRODUCCION</code> ni el sitio público. Las referencias externas del código se identificaron sin abrirlas.</p>
+  </section>
+
+  <section aria-labelledby="resumen">
+    <h2 id="resumen">Resumen ejecutivo</h2>
+    <p>El desarrollo presenta una base visual y técnica consistente: la propuesta se entiende, los tres grupos de productos tienen rutas propias, los CTA de WhatsApp son visibles y el diseño responde correctamente a 390 px y 1440 px sin desbordamiento horizontal.</p>
+    <p>Las cinco páginas HTML principales tienen título, descripción, canonical, un solo H1 y texto alternativo en todas las imágenes inspeccionadas. Las rutas críticas respondieron HTTP 200, las 56 referencias internas verificadas existen y los siete archivos PHP pasaron validación sintáctica.</p>
+    <p>La prioridad inmediata no es de diseño: el catálogo aprobado publica <strong>$111.111 CLP</strong> como precio referencial de la tinaja de 7 personas y replica ese valor en la ficha y en la base del asistente. Debe validarse antes de cualquier publicación.</p>
+    <p>Las fichas incluyen rendimiento, precio o mecanismo de consulta, CTA, FAQ y condiciones; sin embargo, “qué incluye”, instalación, despacho y garantía usan textos genéricos que posponen la decisión a la cotización. Convertirlos en condiciones concretas reduciría fricción y preguntas repetidas.</p>
+    <p>También existe un enlace de Instagram antiguo en la galería de inicio, mientras el resto del sitio usa la cuenta nueva. En accesibilidad se verificó foco visible y soporte de movimiento reducido; queda como mejora ampliar o espaciar enlaces de texto que renderizan con 19–23 px de alto.</p>
+  </section>
+
+  <section aria-labelledby="score">
+    <h2 id="score">Score local</h2>
+    <div class="score-grid">
+      <div class="score-total"><div><strong>80</strong><span>sobre 100 · base sólida con riesgo comercial puntual</span></div></div>
+      <div class="score-bars" aria-label="Desglose del puntaje">
+        <div class="score-row"><span>Conversión</span><div class="bar"><i style="width:85%"></i></div><b>17/20</b></div>
+        <div class="score-row"><span>Contenido y fichas</span><div class="bar"><i style="width:65%"></i></div><b>13/20</b></div>
+        <div class="score-row"><span>SEO on-page</span><div class="bar"><i style="width:87%"></i></div><b>13/15</b></div>
+        <div class="score-row"><span>UX y accesibilidad</span><div class="bar"><i style="width:75%"></i></div><b>15/20</b></div>
+        <div class="score-row"><span>Calidad técnica</span><div class="bar"><i style="width:93%"></i></div><b>14/15</b></div>
+        <div class="score-row"><span>Analítica implementada</span><div class="bar"><i style="width:80%"></i></div><b>4/5</b></div>
+        <div class="score-row"><span>Arquitectura</span><div class="bar"><i style="width:80%"></i></div><b>4/5</b></div>
+      </div>
+    </div>
+    <p class="quiet" style="margin-top:18px">El puntaje evalúa únicamente lo observable localmente. No representa rendimiento comercial ni posicionamiento real.</p>
+  </section>
+
+  <section aria-labelledby="top5">
+    <h2 id="top5">Top 5 hallazgos</h2>
+    <div class="findings">
+      <article class="finding">
+        <div class="finding-head"><h3>1. Precio anómalo aprobado y visible para la tinaja de 7 personas</h3><div class="badges"><span class="badge critical">Severidad alta</span><span class="badge verified">Verificado</span></div></div>
+        <p>El catálogo local marca el producto como aprobado y publica <strong>$111.111 CLP · referencial</strong>. El mismo valor aparece en la ficha y en el conocimiento del asistente, por lo que un error se propaga a varios puntos de contacto.</p>
+        <div class="evidence"><code>DESARROLLO/Web/assets/data/catalogo-rpv.json</code> — <code>tinaja-7-personas</code>, <code>precio_clp: 111111</code>, <code>aprobado: true</code>; <code>DESARROLLO/Web/tinajas/index.html:26</code>.</div>
+        <div class="metrics"><span class="metric">Impacto 5/5</span><span class="metric">Esfuerzo 1/5</span><span class="metric">Acción: validar y corregir desde el catálogo</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-head"><h3>2. Las condiciones decisivas existen, pero son genéricas</h3><div class="badges"><span class="badge medium">Severidad media</span><span class="badge recommendation">Recomendación</span></div></div>
+        <p>Las tres categorías incluyen “Qué incluye”, instalación, despacho y garantía dentro de elementos desplegables. El contenido confirma que se informará después, pero no permite comparar alcance, costo o cobertura antes de iniciar la conversación.</p>
+        <div class="evidence"><code>tinajas/index.html:25-26</code>, <code>calderas/index.html:205-207</code> y <code>estufas-a-pellets/index.html:101-110</code> repiten textos como “se confirman por escrito en la cotización”.</div>
+        <div class="metrics"><span class="metric">Impacto 4/5</span><span class="metric">Esfuerzo 3/5</span><span class="metric">Acción: reemplazar genéricos por condiciones verificadas</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-head"><h3>3. Un CTA de inspiración conserva una cuenta de Instagram distinta</h3><div class="badges"><span class="badge medium">Severidad media</span><span class="badge verified">Verificado</span></div></div>
+        <p>La página de inicio usa mayoritariamente <code>calderas.tinajas.estufas</code>, pero el enlace “Ver más inspiración” apunta a <code>rpv.construcciones</code>. La inconsistencia puede dividir tráfico o llevar a una cuenta obsoleta.</p>
+        <div class="evidence"><code>DESARROLLO/Web/index.html:98</code> y <code>:147</code> usan la cuenta nueva; <code>DESARROLLO/Web/index.html:135</code> conserva la anterior.</div>
+        <div class="metrics"><span class="metric">Impacto 3/5</span><span class="metric">Esfuerzo 1/5</span><span class="metric">Acción: confirmar la cuenta oficial y unificar</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-head"><h3>4. Enlaces secundarios quedan por debajo de 24 px de alto</h3><div class="badges"><span class="badge low">Severidad baja</span><span class="badge recommendation">Recomendación</span></div></div>
+        <p>En vistas de 390 px y 1440 px se observaron enlaces de texto con cajas renderizadas de 19–23 px de alto. Los CTA principales son mayores; conviene ampliar el área táctil o verificar separación suficiente en navegación, “Ver detalles” y enlaces de fichas.</p>
+        <div class="evidence">Automatización local en <code>http://localhost:8000</code>: inicio, tinajas, calderas y estufas; ejemplos <code>Ver detalles</code> 19 px y enlaces de ficha 22–23 px.</div>
+        <div class="metrics"><span class="metric">Impacto 3/5</span><span class="metric">Esfuerzo 2/5</span><span class="metric">Acción: padding o separación equivalente</span></div>
+      </article>
+
+      <article class="finding">
+        <div class="finding-head"><h3>5. La portada no define un landmark <code>&lt;main&gt;</code></h3><div class="badges"><span class="badge low">Severidad baja</span><span class="badge verified">Verificado</span></div></div>
+        <p>Las fichas de producto sí exponen un elemento principal, mientras la portada organiza su contenido con secciones directamente entre cabecera y pie. Agregar el landmark mejora la navegación de tecnologías de asistencia sin alterar el diseño.</p>
+        <div class="evidence">DOM local: <code>/</code> contiene 0 elementos <code>main</code>; <code>/tinajas/</code>, <code>/calderas/</code> y <code>/estufas-a-pellets/</code> contienen 1.</div>
+        <div class="metrics"><span class="metric">Impacto 2/5</span><span class="metric">Esfuerzo 1/5</span><span class="metric">Acción: envolver el contenido central</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="matriz">
+    <h2 id="matriz">Matriz de fichas de producto</h2>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Matriz desplazable de fichas de producto">
+      <table>
+        <caption>Cobertura observable en las fichas locales</caption>
+        <thead><tr><th scope="col">Criterio</th><th scope="col">Tinajas</th><th scope="col">Calderas</th><th scope="col">Estufas</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Cotización / precio</th><td><span class="yes">Sí</span> — dos precios referenciales; uno requiere validación urgente.</td><td><span class="yes">Sí</span> — precios A, B y C, más vigencia.</td><td><span class="yes">Sí</span> — “Precio a consultar” y CTA específico.</td></tr>
+          <tr><th scope="row">Especificaciones</th><td><span class="partial">Parcial</span> — capacidad y dimensiones; faltan litros del modelo de 4 personas y ficha completa.</td><td><span class="partial">Parcial</span> — rendimiento, consumo y combustible; faltan potencia, medidas y requisitos completos.</td><td><span class="partial">Parcial</span> — cobertura y consumo; faltan ficha completa, potencia y requisitos eléctricos.</td></tr>
+          <tr><th scope="row">Qué incluye</th><td><span class="partial">Parcial</span> — se difiere a cotización.</td><td><span class="partial">Parcial</span> — se difiere a cotización.</td><td><span class="partial">Parcial</span> — se difiere a cotización.</td></tr>
+          <tr><th scope="row">Instalación</th><td><span class="partial">Parcial</span> — guía de preparación, sin alcance/costo concreto.</td><td><span class="partial">Parcial</span> — requisitos a confirmar; guía de uso disponible.</td><td><span class="partial">Parcial</span> — advertencias de ventilación y gases, sin alcance concreto.</td></tr>
+          <tr><th scope="row">Despacho</th><td><span class="partial">Parcial</span> — sujeto a comuna.</td><td><span class="partial">Parcial</span> — sujeto a comuna.</td><td><span class="partial">Parcial</span> — sujeto a comuna.</td></tr>
+          <tr><th scope="row">Garantía</th><td><span class="partial">Parcial</span> — solicita condiciones por escrito.</td><td><span class="partial">Parcial</span> — solicita condiciones por escrito.</td><td><span class="partial">Parcial</span> — solicita condiciones por escrito.</td></tr>
+          <tr><th scope="row">FAQ</th><td><span class="yes">Sí</span> — cinco preguntas orientadas a decisión.</td><td><span class="yes">Sí</span> — FAQ visible y schema FAQPage.</td><td><span class="yes">Sí</span> — bloque “Lo esencial antes de cotizar”.</td></tr>
+          <tr><th scope="row">CTA</th><td><span class="yes">Sí</span> — cabecera, modelo y cierre.</td><td><span class="yes">Sí</span> — cabecera, modelo y cierre.</td><td><span class="yes">Sí</span> — cabecera, ficha, orientación y cierre.</td></tr>
+          <tr><th scope="row">Evidencia técnica</th><td><span class="partial">Parcial</span> — fotografías y datos comerciales.</td><td><span class="yes">Sí</span> — guía, ficha original y referencia de solicitud.</td><td><span class="partial">Parcial</span> — secuencia de uso y piezas gráficas, sin ficha integral.</td></tr>
+          <tr><th scope="row">Complementarios</th><td><span class="yes">Sí</span> — enlace contextual a calderas.</td><td><span class="yes">Sí</span> — navegación a tinajas y estufas.</td><td><span class="yes">Sí</span> — navegación a calderas y tinajas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="backlog">
+    <h2 id="backlog">Backlog priorizado</h2>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Backlog desplazable">
+      <table>
+        <caption>Acciones propuestas por horizonte</caption>
+        <thead><tr><th scope="col">Horizonte</th><th scope="col">Acción</th><th scope="col">Impacto</th><th scope="col">Esfuerzo</th><th scope="col">Estado</th></tr></thead>
+        <tbody>
+          <tr><td>7 días</td><td>Validar el precio de la tinaja de 7 personas y corregirlo desde el catálogo para sincronizar HTML, JSON y asistente.</td><td>5</td><td>1</td><td>Verificado</td></tr>
+          <tr><td>7 días</td><td>Confirmar la cuenta oficial de Instagram y unificar el enlace de la galería de inicio.</td><td>3</td><td>1</td><td>Verificado</td></tr>
+          <tr><td>7 días</td><td>Agregar <code>&lt;main&gt;</code> a la portada y comprobar el orden de landmarks.</td><td>2</td><td>1</td><td>Verificado</td></tr>
+          <tr><td>30 días</td><td>Definir condiciones reales y aprobadas de incluidos, instalación, despacho y garantía por categoría o modelo.</td><td>4</td><td>3</td><td>Recomendación</td></tr>
+          <tr><td>30 días</td><td>Ampliar el área táctil de enlaces secundarios o documentar que su separación cumple el mínimo aplicable.</td><td>3</td><td>2</td><td>Recomendación</td></tr>
+          <tr><td>30 días</td><td>Agregar validaciones del catálogo que alerten precios atípicos, datos de prueba y productos aprobados con condiciones genéricas.</td><td>5</td><td>3</td><td>Recomendación</td></tr>
+          <tr><td>90 días</td><td>Completar fichas técnicas: potencia, medidas, electricidad, ventilación, compatibilidad y capacidades faltantes, solo con evidencia aprobada.</td><td>4</td><td>4</td><td>Recomendación</td></tr>
+          <tr><td>90 días</td><td>Revisar datos estructurados por producto y alinear los campos publicados con el catálogo comercial validado.</td><td>3</td><td>3</td><td>Recomendación</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="no-verificable">
+    <h2 id="no-verificable">No verificable localmente</h2>
+    <p>Estos puntos requieren fuentes o medición externas y no se calificaron como defectos:</p>
+    <ul>
+      <li>Estado de producción, contenido del sitio público y configuración de cPanel.</li>
+      <li>Conversiones reales de WhatsApp, ventas, tráfico, Search Console y comportamiento de usuarios.</li>
+      <li>Core Web Vitals de campo, indexación, posiciones y resultados enriquecidos en buscadores.</li>
+      <li>Vigencia comercial real de precios, stock, plazos, cobertura de despacho y medios de pago.</li>
+      <li>Autenticidad de reseñas, certificaciones, garantía contractual, servicio técnico y cumplimiento documental externo.</li>
+      <li>Disponibilidad o destino actual de cuentas sociales y enlaces externos, que no se abrieron durante esta revisión.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="acciones">
+    <h2 id="acciones">Tres acciones inmediatas</h2>
+    <div class="actions">
+      <article class="action-card"><span class="number">1</span><h3>Sanear el catálogo</h3><p>Confirmar el valor real de la tinaja de 7 personas y regenerar sus salidas.</p><p class="quiet"><strong>Métrica:</strong> 0 productos aprobados con valores de prueba o no confirmados.</p><p class="quiet"><strong>Resultado esperado:</strong> una única verdad comercial consistente.</p></article>
+      <article class="action-card"><span class="number">2</span><h3>Unificar Instagram</h3><p>Validar la cuenta oficial y reemplazar la única URL divergente de la portada.</p><p class="quiet"><strong>Métrica:</strong> 100% de enlaces y schema apuntan a la misma cuenta aprobada.</p><p class="quiet"><strong>Resultado esperado:</strong> evitar pérdida o división de tráfico social.</p></article>
+      <article class="action-card"><span class="number">3</span><h3>Concretar condiciones</h3><p>Publicar al menos alcance, exclusiones y forma de confirmación para instalación, despacho y garantía.</p><p class="quiet"><strong>Métrica:</strong> 3/3 categorías con condiciones específicas aprobadas.</p><p class="quiet"><strong>Resultado esperado:</strong> menos fricción y consultas repetitivas antes de cotizar.</p></article>
+    </div>
+  </section>
+
+  <section aria-labelledby="cuadro-resumen">
+    <h2 id="cuadro-resumen">Cuadro resumen de hallazgos</h2>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Resumen desplazable de hallazgos">
+      <table class="summary">
+        <caption>Última sección del diagnóstico</caption>
+        <thead><tr><th scope="col">Estado</th><th scope="col">Hallazgo</th><th scope="col">Evidencia local</th><th scope="col">Prioridad</th><th scope="col">Siguiente acción</th></tr></thead>
+        <tbody>
+          <tr><td>Verificado</td><td>Precio anómalo de tinaja de 7 personas, aprobado y visible.</td><td><code>catalogo-rpv.json</code>; <code>tinajas/index.html:26</code></td><td class="priority-high">Alta</td><td>Validar y corregir desde el catálogo.</td></tr>
+          <tr><td>Recomendación</td><td>Condiciones de incluidos, instalación, despacho y garantía demasiado genéricas.</td><td>Bloques <code>catalog-conditions</code> en las tres categorías.</td><td class="priority-high">Alta</td><td>Publicar condiciones específicas y aprobadas.</td></tr>
+          <tr><td>Verificado</td><td>URL de Instagram divergente en la galería de inicio.</td><td><code>index.html:135</code> frente a <code>:98</code> y <code>:147</code>.</td><td class="priority-medium">Media</td><td>Confirmar la cuenta oficial y unificar.</td></tr>
+          <tr><td>Recomendación</td><td>Enlaces secundarios con 19–23 px de alto renderizado.</td><td>Prueba local a 390 px y 1440 px.</td><td class="priority-medium">Media</td><td>Ampliar área táctil o asegurar separación equivalente.</td></tr>
+          <tr><td>Verificado</td><td>Portada sin landmark <code>&lt;main&gt;</code>.</td><td>DOM local de <code>/</code>: 0 elementos <code>main</code>.</td><td class="priority-low">Baja</td><td>Envolver el contenido central.</td></tr>
+          <tr><td>Verificado</td><td>Rutas y recursos internos sanos.</td><td>8 rutas HTTP 200; 56/56 referencias internas existentes; 7 PHP sin errores.</td><td class="priority-low">Mantener</td><td>Conservar estas comprobaciones en QA.</td></tr>
+          <tr><td>Verificado</td><td>SEO básico y accesibilidad visual bien cubiertos.</td><td>5/5 páginas con title, description, canonical, H1 único y alt; foco visible y <code>prefers-reduced-motion</code>.</td><td class="priority-low">Mantener</td><td>Evitar regresiones al editar plantillas.</td></tr>
+          <tr><td>No verificable localmente</td><td>Rendimiento comercial, indexación, stock y vigencia externa.</td><td>Requiere analítica, buscadores o fuentes comerciales externas.</td><td class="priority-low">Fuera de alcance</td><td>Medir por separado con fuentes autorizadas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>

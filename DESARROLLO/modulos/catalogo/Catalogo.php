@@ -147,7 +147,14 @@ final class Catalogo
             $html = (string) file_get_contents($filename);
             $html = preg_replace_callback('~(<(span|p|h3|strong)\b[^>]*data-catalog-product="([^"]+)"[^>]*data-catalog-field="([^"]+)"[^>]*>)[^<]*(</\2>)~u', function($m) use ($map) {
                 if (!isset($map[$m[3]])) throw new \RuntimeException('Identificador desconocido en el sitio: ' . $m[3]);
-                $value = $m[4] === 'precio' ? $map[$m[3]]['precio_texto'] : ($map[$m[3]][$m[4]] ?? null);
+                if ($m[4] === 'precio') {
+                    $value = $map[$m[3]]['precio_texto'];
+                } elseif ($m[4] === 'precio_registrado') {
+                    $amount = $map[$m[3]]['precio_clp'] ?? null;
+                    $value = is_int($amount) ? '$' . number_format($amount, 0, ',', '.') . ' CLP' : 'Precio a confirmar por WhatsApp';
+                } else {
+                    $value = $map[$m[3]][$m[4]] ?? null;
+                }
                 if (!is_string($value)) throw new \RuntimeException('Campo desconocido en el sitio: ' . $m[4]);
                 return $m[1] . htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . $m[5];
             }, $html);
