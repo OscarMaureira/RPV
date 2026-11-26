@@ -21,6 +21,11 @@ header('Referrer-Policy: strict-origin-when-cross-origin');
 header("Content-Security-Policy: default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
 
 ini_set('session.use_strict_mode', '1');
+if ($isLocal) {
+    $sessionPath = dirname(__DIR__, 2) . '/.sessions';
+    if (!is_dir($sessionPath) && !mkdir($sessionPath, 0700, true) && !is_dir($sessionPath)) throw new RuntimeException('No se pudo iniciar la sesion local.');
+    session_save_path($sessionPath);
+}
 session_name($isProduction ? 'RPV_OPINIONES' : 'RPV_OPINIONES_DEV');
 session_set_cookie_params(['httponly' => true, 'secure' => $isProduction, 'samesite' => 'Lax', 'path' => '/']);
 session_start();
@@ -35,7 +40,8 @@ function h(string $value): string { return htmlspecialchars($value, ENT_QUOTES |
   <meta name="robots" content="noindex, nofollow"><title>Opiniones de clientes · RPV Construcciones</title>
   <meta name="description" content="Comparte tu experiencia con productos RPV Construcciones.">
   <link rel="preload" href="/assets/images/backgrounds/fondo.webp" as="image" fetchpriority="high">
-  <link rel="stylesheet" href="/opiniones/opiniones.css?v=20261124-1"><script src="/assets/js/hero-effects.js?v=20261112-1" defer></script><script src="/opiniones/opiniones.js?v=20261112-3" defer></script>
+  <link rel="stylesheet" href="/opiniones/opiniones.css?v=20261126-2"><script src="/assets/js/hero-effects.js?v=20261112-1" defer></script><script src="/opiniones/opiniones.js?v=20261126-2" defer></script>
+<script src="/assets/js/secciones-publicas.js?v=20261126-4" defer></script>
 </head>
 <body>
 <?php require __DIR__ . '/componentes/header.php'; ?>
@@ -50,20 +56,40 @@ function h(string $value): string { return htmlspecialchars($value, ENT_QUOTES |
 
   <div class="review-flow">
     <section class="form-card" id="formulario" aria-labelledby="form-title">
-      <div class="section-heading"><span class="step">01</span><div><h2 id="form-title">Comparte tu opinión</h2><p>Todos los campos son obligatorios.</p></div></div>
+      <div class="section-heading"><span class="step">01</span><div><h2 id="form-title">Comparte tu opinión</h2><p>Los campos opcionales están identificados.</p></div></div>
       <form id="review-form" novalidate>
         <input type="hidden" name="csrf" value="<?= h($_SESSION['opiniones_csrf']) ?>">
         <div class="trap" aria-hidden="true"><input id="form_field_extra_7c39" name="form_field_extra_7c39" type="text" tabindex="-1" autocomplete="off"></div>
         <label for="name">Tu nombre</label><input id="name" name="name" type="text" minlength="2" maxlength="80" autocomplete="name" required>
-        <label for="email">Correo electrónico <span class="private">Privado</span></label><input id="email" name="email" type="email" maxlength="254" autocomplete="email" required aria-describedby="email-help"><small id="email-help">Lo usamos solo para registro y contacto si hiciera falta. Nunca se publica ni se usa como contraseña.</small>
+        <label for="email">Correo electrónico <span class="private">Privado</span></label><input id="email" name="email" type="email" maxlength="254" autocomplete="email" required aria-describedby="email-help"><small id="email-help">Lo usamos solo para registro y contacto si hiciera falta. Nunca se publicará.</small>
         <label for="city">Ciudad <span class="optional">(opcional)</span></label><input id="city" name="city" type="text" maxlength="80" autocomplete="address-level2">
-        <label for="company">Empresa o pyme <span class="optional">(opcional)</span></label><input id="company" name="company" type="text" maxlength="120" autocomplete="organization">
         <label for="product">Producto</label><select id="product" name="product" required><option value="">Elige un producto</option><option>Calderas</option><option>Tinajas</option><option>Estufas a pellets</option></select>
         <fieldset class="rating"><legend>Tu valoración</legend><div class="stars" role="radiogroup" aria-label="Valoración de 1 a 5 estrellas">
           <?php for ($i = 1; $i <= 5; $i++): ?><label><input type="radio" name="rating" value="<?= $i ?>" required><span aria-hidden="true">★</span><span class="sr-only"><?= $i ?> <?= $i === 1 ? 'estrella' : 'estrellas' ?></span></label><?php endfor; ?>
         </div><small>Selecciona de 1 a 5 estrellas.</small></fieldset>
         <label for="comment">Tu comentario</label><textarea id="comment" name="comment" minlength="15" maxlength="1200" rows="5" required aria-describedby="comment-help"></textarea><small id="comment-help">Entre 15 y 1.200 caracteres.</small>
-        <label class="consent"><input type="checkbox" name="consent" value="1" required><span>Autorizo a RPV Construcciones a publicar mi nombre y este comentario junto con la valoración y el producto. Si agrego ciudad o empresa/pyme, también autorizo su publicación. Mi correo se mantendrá privado.</span></label>
+        <section class="business-promotion" aria-labelledby="business-promotion-title" aria-describedby="promotion-description promotion-cost promotion-description-app promotion-cost-app">
+          <div class="business-promotion-heading">
+            <span class="business-kicker">Beneficio para clientes RPV</span>
+            <h3 id="business-promotion-title"><span class="desktop-only">¡Tu experiencia también puede impulsar tu negocio!</span><span class="app-only">¡Impulsa también tu negocio!</span></h3>
+          </div>
+          <div class="promotion-intro desktop-only">
+            <strong>En RPV Construcciones queremos que nuestros clientes también crezcan.</strong>
+            <p id="promotion-description">Si tienes una empresa o emprendimiento, puedes compartir su nombre y sitio web junto con tu opinión. Cuando publiquemos tu experiencia, otros visitantes podrán conocer tu negocio y visitar tu página web.</p>
+            <p><strong>¡Comparte tu experiencia y dale mayor visibilidad a tu emprendimiento!</strong></p>
+            <small id="promotion-cost">Participar es completamente opcional y no tiene costo. La publicación depende de la revisión administrativa.</small>
+          </div>
+          <div class="promotion-intro app-only">
+            <p id="promotion-description-app"><strong>¿Tienes una empresa o emprendimiento?</strong> Comparte su nombre y sitio web para que podamos mostrarlos junto con tu opinión.</p>
+            <small id="promotion-cost-app">Es opcional, sin costo y sujeto a revisión.</small>
+          </div>
+          <label for="company-name">Nombre de la empresa o emprendimiento <span class="optional">(opcional)</span></label>
+          <input id="company-name" name="company_name" type="text" maxlength="120" autocomplete="off">
+          <label for="company-url">Sitio web de la empresa <span class="optional">(opcional)</span></label>
+          <input id="company-url" name="company_url" type="url" maxlength="2048" inputmode="url" autocomplete="off" placeholder="https://www.ejemplo.cl" aria-describedby="company-url-help">
+          <small id="company-url-help">El nombre y el sitio web deben informarse juntos. Solo se aceptan enlaces HTTP o HTTPS.</small>
+        </section>
+        <label class="consent consent-primary"><input type="checkbox" name="consent" value="1" required><span>Autorizo a RPV Construcciones a publicar mi nombre y este comentario junto con la valoración, el producto y, si la informo, mi ciudad. Mi correo se mantendrá privado. Si informo el nombre o sitio web de mi empresa o emprendimiento, autorizo también a publicarlos junto con mi opinión.</span></label>
       </form>
     </section>
 
@@ -75,6 +101,7 @@ function h(string $value): string { return htmlspecialchars($value, ENT_QUOTES |
         <blockquote id="preview-comment" hidden></blockquote>
         <p class="preview-name" id="preview-name" hidden></p>
         <p class="preview-meta" id="preview-meta" hidden></p>
+        <div class="preview-business" id="preview-business" hidden><span>Conoce su negocio</span><strong id="preview-company-name"></strong><a id="preview-company-url" href="#" target="_blank" rel="noopener noreferrer nofollow ugc" hidden>Visitar sitio web</a></div>
       </article>
     </section>
   </div>

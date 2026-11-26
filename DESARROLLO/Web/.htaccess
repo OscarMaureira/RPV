@@ -1,3 +1,5 @@
+DirectoryIndex index.php index.html
+
 # Las copias de respaldo nunca deben quedar accesibles desde el webroot.
 <IfModule mod_alias.c>
   RedirectMatch 404 "(?i)^/BKP(?:/|$)"
@@ -6,4 +8,6 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^BKP(?:/|$) - [R=404,L,NC]
+  RewriteCond %{THE_REQUEST} \s/+((tinajas|calderas|estufas-a-pellets)/)index\.html(?:[?\s]) [NC]
+  RewriteRule ^(tinajas|calderas|estufas-a-pellets)/index\.html$ /$1/ [R=302,L,NE]
 </IfModule>

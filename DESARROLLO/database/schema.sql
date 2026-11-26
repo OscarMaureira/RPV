@@ -31,25 +31,43 @@ CREATE TABLE IF NOT EXISTS testimonios (
   nombre_publico VARCHAR(80) NOT NULL,
   correo_privado VARCHAR(254) NULL,
   ciudad VARCHAR(80) NULL,
-  empresa_pyme VARCHAR(120) NULL,
+  nombre_empresa VARCHAR(120) NULL,
+  url_empresa VARCHAR(2048) NULL,
+  autoriza_promocion TINYINT(1) NOT NULL DEFAULT 0,
   categoria VARCHAR(30) NOT NULL DEFAULT 'General',
   calificacion TINYINT UNSIGNED NULL,
   comentario TEXT NOT NULL,
   consentimiento_publicacion TINYINT(1) NOT NULL DEFAULT 0,
-  estado ENUM('borrador', 'publicado') NOT NULL DEFAULT 'borrador',
+  estado ENUM('borrador', 'publicada', 'eliminada') NOT NULL DEFAULT 'borrador',
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   actualizado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   publicado_en TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (id_testimonio),
-  KEY idx_testimonios_estado_fecha (estado, publicado_en)
+  KEY idx_testimonios_estado_fecha (estado, publicado_en),
+  KEY idx_testimonios_estado_creado (estado, creado_en, id_testimonio)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Conserva los testimonios existentes al actualizar una base ya inicializada.
-ALTER TABLE testimonios
-  ADD COLUMN IF NOT EXISTS empresa_pyme VARCHAR(120) NULL AFTER ciudad;
-
+-- Conserva y normaliza los testimonios existentes al actualizar una base ya
+-- inicializada. empresa_pyme se recrea temporalmente para que este esquema sea
+-- idempotente incluso después de haber completado la normalizacion.
 ALTER TABLE testimonios
   ADD COLUMN IF NOT EXISTS correo_privado VARCHAR(254) NULL AFTER nombre_publico;
+
+ALTER TABLE testimonios
+  ADD COLUMN IF NOT EXISTS empresa_pyme VARCHAR(120) NULL AFTER ciudad,
+  ADD COLUMN IF NOT EXISTS nombre_empresa VARCHAR(120) NULL AFTER ciudad,
+  ADD COLUMN IF NOT EXISTS url_empresa VARCHAR(2048) NULL AFTER nombre_empresa,
+  ADD COLUMN IF NOT EXISTS autoriza_promocion TINYINT(1) NOT NULL DEFAULT 0 AFTER url_empresa;
+
+UPDATE testimonios
+SET nombre_empresa=CASE
+  WHEN NULLIF(TRIM(nombre_empresa),'') IS NOT NULL THEN TRIM(nombre_empresa)
+  ELSE NULLIF(TRIM(empresa_pyme),'')
+END;
+
+ALTER TABLE testimonios
+  DROP COLUMN IF EXISTS empresa_pyme,
+  MODIFY COLUMN nombre_empresa VARCHAR(120) NULL AFTER ciudad;
 
 -- Catálogo comercial local, fuente de las páginas y los asistentes.
 CREATE TABLE IF NOT EXISTS catalogo_productos (
@@ -75,11 +93,13 @@ CREATE TABLE IF NOT EXISTS catalogo_productos (
 CREATE TABLE IF NOT EXISTS admin_usuarios (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   usuario VARCHAR(80) NOT NULL,
+  correo VARCHAR(254) NULL,
   password_hash VARCHAR(255) NOT NULL,
   activo TINYINT(1) NOT NULL DEFAULT 1,
   creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY uq_admin_usuarios_usuario (usuario)
+  UNIQUE KEY uq_admin_usuarios_usuario (usuario),
+  UNIQUE KEY uq_admin_usuarios_correo (correo)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS estados (
   codigo VARCHAR(20) NOT NULL PRIMARY KEY,
@@ -114,3 +134,6 @@ CREATE TABLE IF NOT EXISTS admin_log (
   KEY idx_admin_log_actor (actor_usuario, fecha),
   KEY idx_admin_log_entidad (entidad, entidad_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- El panel administrativo ampliado se instala con la migracion versionada
+-- database/migrations/20261125_admin_panel_unificado.sql.

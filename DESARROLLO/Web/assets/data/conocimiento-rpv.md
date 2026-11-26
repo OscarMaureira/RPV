@@ -1,11 +1,11 @@
 # RPV Construcciones — Base de conocimiento del asistente
 
-> Generado desde el catálogo comercial. Revisión: ca544eb82333b7eda3feafe5cc88e0a1da20ea4c502db5b2806372afe405a375. Administrar desde el panel de precios; no editar este archivo generado.
+> Generado desde el catálogo comercial. Revisión: c899021bd92b20135479385c43a9bf63c76bd0d80aca8e9d3b3f034ba1cccd79. Administrar desde el panel de precios; no editar este archivo generado.
 
 ## ¿Cuáles son los precios de las calderas?
-Caldera tipo A: $1.150.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 1 hora, con un consumo referencial de 1 saco de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
-Caldera tipo B: $830.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2 horas, con un consumo referencial de 2 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
-Caldera tipo C: $730.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2,5 horas, con un consumo referencial de 2,5 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo A: $670.900 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 1 hora, con un consumo referencial de 1 saco de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo B: $222 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2 horas, con un consumo referencial de 2 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo C: $350.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2,5 horas, con un consumo referencial de 2,5 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
 
 ## ¿Cuáles son los precios de las tinajas?
 Tinaja para 4 personas: $1.450.000 CLP · referencial. Capacidad de referencia: 4 personas. Diámetro de 1,75 m y altura de 0,60 m; confirmar dimensiones al cotizar. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
@@ -15,7 +15,7 @@ Tinaja para 7 personas: $111.111 CLP · referencial. Capacidad de referencia: 7 
 Estufa a pellets: Precio a consultar. Cobertura referencial de aproximadamente 70 m² y consumo de 1,3 kg de pellets por hora; depende de la aislación y condiciones del recinto. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
 
 ## ¿Cuánto cuesta Caldera tipo A?
-Caldera tipo A: $1.150.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 1 hora, con un consumo referencial de 1 saco de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo A: $670.900 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 1 hora, con un consumo referencial de 1 saco de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
 
 ## Rendimiento — Caldera tipo A
 Tempera 1.000 litros de agua a 37 °C en 1 hora, con un consumo referencial de 1 saco de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión.
@@ -33,7 +33,7 @@ Disponibilidad, plazo y costo de despacho sujetos a confirmación según la comu
 Solicitar las condiciones escritas de garantía, cobertura y exclusiones del producto antes de comprar.
 
 ## ¿Cuánto cuesta Caldera tipo B?
-Caldera tipo B: $830.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2 horas, con un consumo referencial de 2 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo B: $222 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2 horas, con un consumo referencial de 2 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
 
 ## Rendimiento — Caldera tipo B
 Tempera 1.000 litros de agua a 37 °C en 2 horas, con un consumo referencial de 2 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión.
@@ -51,7 +51,7 @@ Disponibilidad, plazo y costo de despacho sujetos a confirmación según la comu
 Solicitar las condiciones escritas de garantía, cobertura y exclusiones del producto antes de comprar.
 
 ## ¿Cuánto cuesta Caldera tipo C?
-Caldera tipo C: $730.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2,5 horas, con un consumo referencial de 2,5 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
+Caldera tipo C: $350.000 CLP · referencial. Tempera 1.000 litros de agua a 37 °C en 2,5 horas, con un consumo referencial de 2,5 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión. Incluye: El equipamiento y los accesorios incluidos se confirman por escrito en la cotización. Confirma precio y disponibilidad al cotizar.
 
 ## Rendimiento — Caldera tipo C
 Tempera 1.000 litros de agua a 37 °C en 2,5 horas, con un consumo referencial de 2,5 sacos de pellet. Combustible: pellet. Consumo informado: 9,5 kg/h. Permite llenado manual desde manguera o recirculación mediante termofusión.

@@ -50,9 +50,14 @@ configurada en HeidiSQL y apunta al puerto `4444`.
 La página está en `http://localhost:8000/opiniones/` durante desarrollo y en
 `https://www.rpvconstrucciones.com/opiniones/` en producción. Acepta envíos sin
 cuenta y los guarda en `testimonios` como borradores pendientes de revisión.
-Ciudad y empresa/pyme son opcionales; `correo_privado` nunca se muestra en la
+Ciudad y nombre de empresa o emprendimiento son opcionales; `nombre_empresa` es
+el único campo comercial canónico y `correo_privado` nunca se muestra en la
 vista pública. La API selecciona la conexión y el módulo de notificaciones según
 el host: rutas locales en desarrollo y rutas externas preconfiguradas en cPanel.
+Para consolidar una base local antigua que todavía tenga `empresa_pyme`, ejecuta
+`powershell -ExecutionPolicy Bypass -File .\DESARROLLO\scripts\aplicar-normalizacion-testimonios-admin.ps1`.
+El comando conserva los nombres en `nombre_empresa`, elimina la columna antigua
+y solicita la contraseña de `root` directamente en MariaDB.
 
 El gestor local `http://localhost:8002/` trabaja solo con la base de desarrollo.
 La administración de la base productiva sigue separada de los archivos públicos.

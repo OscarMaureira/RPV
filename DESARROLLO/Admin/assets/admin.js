@@ -7,7 +7,7 @@ if (form) {
   const confirmSave = document.querySelector('#confirm-save');
   const name = form.querySelector('#nombre_publico');
   const city = form.querySelector('#ciudad');
-  const company = form.querySelector('#empresa_pyme');
+  const company = form.querySelector('#nombre_empresa');
   const category = form.querySelector('#categoria');
   const ratingControl = form.querySelector('#rating-control');
   const ratingOptions = [...ratingControl.querySelectorAll('input[name="calificacion"]')];

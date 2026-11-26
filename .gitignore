@@ -1,11 +1,13 @@
 # Configuración y datos locales sensibles
 /DESARROLLO/BaseDatos/conexion_rpv.local.php
 /DESARROLLO/BaseDatos/admin_testimonios.local.php
+/DESARROLLO/BaseDatos/admin_panel.local.php
 /DESARROLLO/.env
 /respaldos/base-datos/
 /respaldos/codigo/produccion-*.zip
 /DESARROLLO/.tmp-admin-review/
 /DESARROLLO/logs/
+/DESARROLLO/.sessions/
 # Captura con datos personales; solo para revisión local.
 /DESARROLLO/Web/assets/docs/calderas/solicitud-patente-captura.pdf
 

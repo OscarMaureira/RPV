@@ -1,5 +1,6 @@
 // Asistente RPV | Version 2026-11-10-11 | ubicacion discreta y guardado automatico
 (()=>{'use strict';
+if(!/^\/(?:index\.html)?$/.test(window.location.pathname))return;
 if(window.__RPV_CHAT_INITIALIZED__)return;
 window.__RPV_CHAT_INITIALIZED__=true;
 const $=id=>document.getElementById(id), L=$('launcher'),C=$('chat'),B=$('backdrop'),M=$('messages'),Q=$('question'),WA=$('chatWa'),S=$('status'),H=$('hint'),anchor=$('anchor'),mobile=matchMedia('(max-width:767px)');

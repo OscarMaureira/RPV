@@ -5,6 +5,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent | Split-Path -Parent
 $developmentWeb = Join-Path $projectRoot 'DESARROLLO\Web'
+$developmentAdmin = Join-Path $projectRoot 'DESARROLLO\Admin'
 $productionWeb = Join-Path $projectRoot 'PRODUCCION\Web'
 $php = 'C:\xampp\php\php.exe'
 $checks = [System.Collections.Generic.List[string]]::new()
@@ -24,7 +25,7 @@ if ($PrepararProduccion) {
     throw 'QA no puede actualizar PRODUCCION. El usuario debe ejecutar explícitamente /prod.'
 }
 
-foreach ($path in @($developmentWeb, $productionWeb, (Join-Path $projectRoot 'DESARROLLO\database\schema.sql'))) {
+foreach ($path in @($developmentWeb, $developmentAdmin, $productionWeb, (Join-Path $projectRoot 'DESARROLLO\database\schema.sql'))) {
     if (-not (Test-Path -LiteralPath $path)) { throw "Falta la ruta requerida: $path" }
 }
 Add-Check 'Estructura de ambientes disponible.'
@@ -34,8 +35,13 @@ Add-Check 'Estructura de ambientes disponible.'
 if ($LASTEXITCODE -ne 0) { throw 'No fue posible iniciar el ambiente de desarrollo.' }
 Add-Check 'Ambiente de desarrollo abierto en el navegador predeterminado: http://localhost:8000.'
 
+& powershell.exe -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot 'abrir-panel-administracion.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'No fue posible iniciar el Panel de Administración de desarrollo.' }
+Add-Check 'Panel de Administración de desarrollo abierto en el navegador predeterminado: http://localhost:8002/.'
+
 if (-not (Test-Path -LiteralPath $php)) { throw 'No se encontró PHP de XAMPP.' }
 $phpFiles = Get-ChildItem -LiteralPath (Join-Path $projectRoot 'DESARROLLO\Web') -Filter '*.php' -File -Recurse
+$phpFiles += Get-ChildItem -LiteralPath $developmentAdmin -Filter '*.php' -File -Recurse
 $phpFiles += Get-ChildItem -LiteralPath (Join-Path $projectRoot 'DESARROLLO\BaseDatos') -Filter '*.php' -File
 foreach ($phpFile in $phpFiles) {
     & $php -l $phpFile.FullName | Out-Null
